@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+
+  main:
+    build:
+      context: .
+    volumes:
+      - .:/usr/src/app
+    command: python ./main.py
+
+  test-linereader:
+    ports:
+      - 3000:3000
+    build:
+      context: .
+    volumes:
+      - .:/usr/src/app
+    command: python tests/linereader.test.py
+
+  test-pdfparser:
+    ports:
+      - 3000:3000
+    build:
+      context: .
+    volumes:
+      - .:/usr/src/app
+    command: python tests/pdfparser.test.py
+
+  test-ccmparser:
+    ports:
+      - 3000:3000
+    build:
+      context: .
+    volumes:
+      - .:/usr/src/app
+    command: python tests/ccmparser.test.py
