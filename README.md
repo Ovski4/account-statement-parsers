@@ -39,7 +39,7 @@ Create the vscode debugger configuration:
 }
 ```
 
-Uncomment these lines in your test file:
+Uncomment these lines in your test files:
 
 ```py
 import ptvsd
