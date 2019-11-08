@@ -20,7 +20,6 @@ class TestCCMParser(unittest.TestCase):
 
         ccmparser = CCMParser(self.lines)
         transactions = ccmparser.parse()
-        pdfFile.close()
 
         with open('./tests/expected-results.json') as file:
             expectedData = json.loads(file.read())

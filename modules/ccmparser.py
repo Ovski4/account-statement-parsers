@@ -51,11 +51,11 @@ class CCMParser:
     def isHeaderTableLine(self, line):
         if (
             len(line) == 5 and
-            line[0]['value'] == 'Date' and
-            line[1]['value'] == 'Date valeur' and
-            line[2]['value'] == 'Opération' and
-            line[3]['value'] == 'Débit euros' and
-            line[4]['value'] == 'Crédit euros'
+            line[0]['value'].lower() == 'date' and
+            line[1]['value'].lower() == 'date valeur' and
+            line[2]['value'].lower() == 'opération' and
+            line[3]['value'].lower() == 'débit euros' and
+            line[4]['value'].lower() == 'crédit euros'
         ):
             return True
         return False
@@ -153,15 +153,15 @@ class CCMParser:
     def getColumnBoundaries(self, line):
         boundaries = {}
         dictionnary = {
-            'Date': 'date',
-            'Date valeur': 'date_valeur',
-            'Opération': 'operation',
-            'Débit euros': 'debit',
-            'Crédit euros': 'credit'
+            'date': 'date',
+            'date valeur': 'date_valeur',
+            'opération': 'operation',
+            'débit euros': 'debit',
+            'crédit euros': 'credit'
         }
 
         for word in line:
-            boundaries[dictionnary[word['value']]] = {
+            boundaries[dictionnary[word['value'].lower()]] = {
                 'x0': word['x0'],
                 'x1': word['x1']
             }
