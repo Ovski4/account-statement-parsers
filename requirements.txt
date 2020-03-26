@@ -1,4 +1,4 @@
-pdfminer.six
+pdfminer.six==20191107
 chardet
 ptvsd
 mysql-connector

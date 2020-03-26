@@ -14,14 +14,14 @@ class TestCCMParser(unittest.TestCase):
     def testParse(self):
         print("\nAssert the file is correctly parsed")
 
-        pdfFile = open('./tests/releve-credit-mutuel.pdf', 'rb')
+        pdfFile = open('./tests/files/releve-credit-mutuel-1.pdf', 'rb')
         self.lines = PdfParser().parse(pdfFile)
         pdfFile.close()
 
         ccmparser = CCMParser(self.lines)
         transactions = ccmparser.parse()
 
-        with open('./tests/expected-results.json') as file:
+        with open('./tests/files/expected-results-1.json') as file:
             expectedData = json.loads(file.read())
 
         self.assertEqual(transactions, expectedData)

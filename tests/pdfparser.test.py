@@ -10,7 +10,7 @@ import unittest
 class TestPdfParser(unittest.TestCase):
 
     def setUp(self):
-        pdfFile = open('./tests/releve-credit-mutuel.pdf', 'rb')
+        pdfFile = open('./tests/files/releve-credit-mutuel-1.pdf', 'rb')
         self.pdfParser = PdfParser()
         self.lines = self.pdfParser.parse(pdfFile)
         pdfFile.close()
