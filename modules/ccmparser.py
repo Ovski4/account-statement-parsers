@@ -143,8 +143,8 @@ class CCMParser:
     def linesAreWithinBoundaries(self, line1, line2):
         # allow a margin of 0.05
         if (
-            (line1['x0']-line2['x0'] >= -0.05 and line2['x1']-line1['x1'] >= -0.05) or
-            (line2['x0']-line1['x0'] >= -0.05 and line1['x1']-line2['x1'] >= -0.05)
+            (line1['x0']-line2['x0'] >= -0.09 and line2['x1']-line1['x1'] >= -0.09) or
+            (line2['x0']-line1['x0'] >= -0.09 and line1['x1']-line2['x1'] >= -0.09)
         ):
             return True
         else:

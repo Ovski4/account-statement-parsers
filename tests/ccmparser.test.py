@@ -157,6 +157,28 @@ class TestCCMParser(unittest.TestCase):
         print("\nAssert the line is a debit line")
 
         headerTableLine = [
+            {'value': 'Date', 'x0': 63.36, 'x1': 80.7, 'y0': 484.98, 'y1': 475.46 },
+            {'value': 'Date valeur', 'x0': 98.4, 'x1': 141.53, 'y0': 484.98, 'y1': 475.46 },
+            {'value': 'Opération', 'x0': 160.8, 'x1': 198.58, 'y0': 484.98, 'y1': 475.46 },
+            {'value': 'Débit EUROS', 'x0': 408.96, 'x1': 459.63, 'y0': 484.98, 'y1': 475.46 },
+            {'value': 'Crédit EUROS', 'x0': 480.24, 'x1': 534.02, 'y0': 484.98, 'y1': 475.46 }
+        ]
+
+        line = [
+            {'value': '08/11/2019', 'x0': 52.08, 'x1': 92.11, 'y0': 152.79, 'y1': 143.54 },
+            {'value': '08/11/2019', 'x0': 100.08, 'x1': 140.11, 'y0': 152.79, 'y1': 143.54 },
+            {'value': 'PAIEMENT CB 0711 RUNGIS', 'x0': 147.6, 'x1': 257.41, 'y0': 152.79, 'y1': 143.54 },
+            {'value': '10,37', 'x0': 439.68, 'x1': 459.7, 'y0': 152.79, 'y1': 143.54 }
+        ]
+
+        ccmParser = CCMParser([line])
+        ccmParser.setColumnBoundaries(headerTableLine)
+        self.assertEqual(ccmParser.isDebitLine(line), True)
+
+    def testOtherLineIsDebit(self):
+        print("\nAssert the line is a debit line")
+
+        headerTableLine = [
             {'value': 'Date', 'x0': 63.36, 'x1': 80.7, 'y0': 484.98, 'y1': 475.46},
             {'value': 'Date valeur', 'x0': 98.4, 'x1': 141.53, 'y0': 484.98, 'y1': 475.46},
             {'value': 'Opération', 'x0': 160.8, 'x1': 198.58, 'y0': 484.98, 'y1': 475.46},
