@@ -141,7 +141,7 @@ class CCMParser:
         return transaction
 
     def linesAreWithinBoundaries(self, line1, line2):
-        # allow a margin of 0.05
+        # allow a margin of 0.09
         if (
             (line1['x0']-line2['x0'] >= -0.09 and line2['x1']-line1['x1'] >= -0.09) or
             (line2['x0']-line1['x0'] >= -0.09 and line1['x1']-line2['x1'] >= -0.09)
@@ -161,8 +161,13 @@ class CCMParser:
         }
 
         for word in line:
-            boundaries[dictionnary[word['value'].lower()]] = {
-                'x0': word['x0'],
+            margin = 0
+            columnHeader = word['value'].lower()
+            if (columnHeader == 'opération'):
+                margin = 13.2
+
+            boundaries[dictionnary[columnHeader]] = {
+                'x0': round(word['x0'] - margin, 2),
                 'x1': word['x1']
             }
 

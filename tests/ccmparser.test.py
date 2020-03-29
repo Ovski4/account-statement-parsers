@@ -12,18 +12,24 @@ import unittest
 class TestCCMParser(unittest.TestCase):
 
     def testParse(self):
-        print("\nAssert the file is correctly parsed")
+        print("\nAssert the files are correctly parsed")
 
         pdfFile = open('./tests/files/releve-credit-mutuel-1.pdf', 'rb')
         self.lines = PdfParser().parse(pdfFile)
         pdfFile.close()
-
         ccmparser = CCMParser(self.lines)
         transactions = ccmparser.parse()
-
         with open('./tests/files/expected-results-1.json') as file:
             expectedData = json.loads(file.read())
+        self.assertEqual(transactions, expectedData)
 
+        pdfFile = open('./tests/files/releve-credit-mutuel-2.pdf', 'rb')
+        self.lines = PdfParser().parse(pdfFile)
+        pdfFile.close()
+        ccmparser = CCMParser(self.lines)
+        transactions = ccmparser.parse()
+        with open('./tests/files/expected-results-2.json') as file:
+            expectedData = json.loads(file.read())
         self.assertEqual(transactions, expectedData)
 
     def testExtractAccountName(self):
@@ -115,7 +121,7 @@ class TestCCMParser(unittest.TestCase):
                 'x1': 141.53
             },
             'operation': {
-                'x0': 160.8,
+                'x0': 147.6,
                 'x1': 198.58
             },
             'debit': {
