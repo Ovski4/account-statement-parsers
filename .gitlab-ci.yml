@@ -2,9 +2,14 @@ image: docker:latest
 
 stages:
   - test
+  - build
+  - push
 
 services:
   - docker:dind
+
+before_script:
+  - docker login --username=$DOCKER_USER --password=$DOCKER_PASS
 
 tests:
   stage: test
@@ -13,3 +18,16 @@ tests:
     - pip install --upgrade pip
     - pip install docker-compose
     - docker-compose run --rm tests
+
+build:
+  stage: build
+  script:
+    - docker build --pull -t ovski/ccm-statement-parser:latest .
+
+push:
+  stage: push
+  script:
+    - docker build --pull -t ovski/ccm-statement-parser:latest .
+    - docker push ovski/ccm-statement-parser:latest
+  only:
+    - master

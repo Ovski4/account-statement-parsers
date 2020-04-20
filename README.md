@@ -3,7 +3,9 @@ Usage
 -----
 
 ```bash
-docker-compose run main
+docker-compose run api
+
+curl -H "Accept: application/json" -X GET container_api?statement=/path/to/statement.pdf
 ```
 
 Tests
