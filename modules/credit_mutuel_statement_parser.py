@@ -1,9 +1,9 @@
 import sys
 sys.path.append('./modules')
-from linereader import LineReader
-from pdfparser import PdfParser
+from line_reader import LineReader
+from pdf_parser import PdfParser
 
-class CCMParser:
+class CreditMutuelStatementParser:
 
     def __init__(self, lines):
         self.lines = lines

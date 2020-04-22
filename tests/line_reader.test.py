@@ -1,6 +1,6 @@
 import sys
 sys.path.append('./modules')
-from linereader import LineReader
+from line_reader import LineReader
 import unittest
 
 # import ptvsd

@@ -17,6 +17,6 @@ services:
       - .:/usr/src/app
     command: >
       bash -c
-      "python tests/linereader.test.py &&
-      python tests/pdfparser.test.py &&
-      python tests/ccmparser.test.py"
+      "python tests/line_reader.test.py &&
+      python tests/pdf_parser.test.py &&
+      python tests/credit_mutuel_statement_parser.test.py"

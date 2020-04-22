@@ -1,6 +1,6 @@
 import sys
 sys.path.append('./modules')
-from pdfparser import PdfParser
+from pdf_parser import PdfParser
 import unittest
 
 # import ptvsd

@@ -1,7 +1,7 @@
 import sys
 sys.path.append('./modules')
-from ccmparser import CCMParser
-from pdfparser import PdfParser
+from credit_mutuel_statement_parser import CreditMutuelStatementParser
+from pdf_parser import PdfParser
 import json
 import unittest
 
@@ -17,7 +17,7 @@ class TestCCMParser(unittest.TestCase):
         pdfFile = open('./tests/files/releve-credit-mutuel-1.pdf', 'rb')
         self.lines = PdfParser().parse(pdfFile)
         pdfFile.close()
-        ccmparser = CCMParser(self.lines)
+        ccmparser = CreditMutuelStatementParser(self.lines)
         transactions = ccmparser.parse()
         with open('./tests/files/expected-results-1.json') as file:
             expectedData = json.loads(file.read())
@@ -26,7 +26,7 @@ class TestCCMParser(unittest.TestCase):
         pdfFile = open('./tests/files/releve-credit-mutuel-2.pdf', 'rb')
         self.lines = PdfParser().parse(pdfFile)
         pdfFile.close()
-        ccmparser = CCMParser(self.lines)
+        ccmparser = CreditMutuelStatementParser(self.lines)
         transactions = ccmparser.parse()
         with open('./tests/files/expected-results-2.json') as file:
             expectedData = json.loads(file.read())
@@ -39,7 +39,7 @@ class TestCCMParser(unittest.TestCase):
             [{'value': 'LIVRET BLEU N° 00020324203 en euros', 'x0': 81.6, 'y0': 694.55, 'x1': 269.56, 'y1': 682.65}]
         ]
 
-        ccmParser = CCMParser(accountLines)
+        ccmParser = CreditMutuelStatementParser(accountLines)
         self.assertEqual(ccmParser.extractAccountName(accountLines[0]), 'C/C EUROCOMPTE JEUNE N° 00020324201')
         self.assertEqual(ccmParser.extractAccountName(accountLines[1]), 'LIVRET BLEU N° 00020324203')
 
@@ -66,7 +66,7 @@ class TestCCMParser(unittest.TestCase):
             ]
         ]
 
-        ccmParser = CCMParser(accountLines)
+        ccmParser = CreditMutuelStatementParser(accountLines)
         self.assertEqual(ccmParser.isAccountNameLine(0, accountLines), False)
         self.assertEqual(ccmParser.isAccountNameLine(1, accountLines), True)
         self.assertEqual(ccmParser.isAccountNameLine(2, accountLines), False)
@@ -95,7 +95,7 @@ class TestCCMParser(unittest.TestCase):
         ]
 
         print("\nAssert the line is a header of a table line")
-        ccmParser = CCMParser(headerTableLines)
+        ccmParser = CreditMutuelStatementParser(headerTableLines)
         self.assertEqual(ccmParser.isHeaderTableLine(headerTableLines[0]), True)
         self.assertEqual(ccmParser.isHeaderTableLine(headerTableLines[1]), False)
         self.assertEqual(ccmParser.isHeaderTableLine(headerTableLines[2]), False)
@@ -134,7 +134,7 @@ class TestCCMParser(unittest.TestCase):
             },
         }
 
-        ccmParser = CCMParser(headerTableLine)
+        ccmParser = CreditMutuelStatementParser(headerTableLine)
         self.assertEqual(ccmParser.getColumnBoundaries(headerTableLine), expectedData)
 
     def testLinesAreWithinBoundaries(self):
@@ -156,7 +156,7 @@ class TestCCMParser(unittest.TestCase):
             {'value': '28,40', 'x0': 439.68, 'x1': 459.7, 'y0': 279.51, 'y1': 270.26}
         ]
 
-        ccmParser = CCMParser([])
+        ccmParser = CreditMutuelStatementParser([])
         self.assertTrue(ccmParser.linesAreWithinBoundaries(line[1], columnBoundaries['date']))
 
     def testLineIsDebit(self):
@@ -177,7 +177,7 @@ class TestCCMParser(unittest.TestCase):
             {'value': '10,37', 'x0': 439.68, 'x1': 459.7, 'y0': 152.79, 'y1': 143.54 }
         ]
 
-        ccmParser = CCMParser([line])
+        ccmParser = CreditMutuelStatementParser([line])
         ccmParser.setColumnBoundaries(headerTableLine)
         self.assertEqual(ccmParser.isDebitLine(line), True)
 
@@ -210,7 +210,7 @@ class TestCCMParser(unittest.TestCase):
             ]
         ]
 
-        ccmParser = CCMParser(lines)
+        ccmParser = CreditMutuelStatementParser(lines)
         ccmParser.setColumnBoundaries(headerTableLine)
         self.assertEqual(ccmParser.isDebitLine(lines[0]), True)
         self.assertEqual(ccmParser.isDebitLine(lines[1]), False)
@@ -245,7 +245,7 @@ class TestCCMParser(unittest.TestCase):
             ]
         ]
 
-        ccmParser = CCMParser(lines)
+        ccmParser = CreditMutuelStatementParser(lines)
         ccmParser.setColumnBoundaries(headerTableLine)
         ccmParser.currentAccount = 'acc 09879'
 

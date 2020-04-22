@@ -4,15 +4,15 @@ import json
 import uuid
 from datetime import datetime
 sys.path.append('modules')
-from ccmparser import CCMParser
-from pdfparser import PdfParser
+from credit_mutuel_statement_parser import CreditMutuelStatementParser
+from pdf_parser import PdfParser
 from klein import run, route
 
 def parse(file_path):
     pdfFile = open(file_path, 'rb')
     lines = PdfParser().parse(pdfFile)
     pdfFile.close()
-    ccmparser = CCMParser(lines)
+    ccmparser = CreditMutuelStatementParser(lines)
     transactions = ccmparser.parse()
 
     return transactions
