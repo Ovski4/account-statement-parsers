@@ -19,7 +19,7 @@ class TestCCMParser(unittest.TestCase):
         pdfFile.close()
         ccmparser = CreditMutuelStatementParser(self.lines)
         transactions = ccmparser.parse()
-        with open('./tests/files/expected-results-1.json') as file:
+        with open('./tests/files/expected-results-credit-mutuel-1.json') as file:
             expectedData = json.loads(file.read())
         self.assertEqual(transactions, expectedData)
 
@@ -28,7 +28,7 @@ class TestCCMParser(unittest.TestCase):
         pdfFile.close()
         ccmparser = CreditMutuelStatementParser(self.lines)
         transactions = ccmparser.parse()
-        with open('./tests/files/expected-results-2.json') as file:
+        with open('./tests/files/expected-results-credit-mutuel-2.json') as file:
             expectedData = json.loads(file.read())
         self.assertEqual(transactions, expectedData)
 
