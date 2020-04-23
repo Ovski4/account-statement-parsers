@@ -15,8 +15,10 @@ services:
       context: .
     volumes:
       - .:/usr/src/app
+    command: python tests/caisse_epargne_statement_parser.test.py
     command: >
       bash -c
       "python tests/line_reader.test.py &&
       python tests/pdf_parser.test.py &&
-      python tests/credit_mutuel_statement_parser.test.py"
+      python tests/credit_mutuel_statement_parser.test.py &&
+      python tests/caisse_epargne_statement_parser.test.py"

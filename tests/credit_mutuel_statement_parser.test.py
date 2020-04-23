@@ -9,7 +9,7 @@ import unittest
 # ptvsd.enable_attach(address = ('0.0.0.0', 3000))
 # ptvsd.wait_for_attach()
 
-class TestCCMParser(unittest.TestCase):
+class TestCreditMutuelStatementParser(unittest.TestCase):
 
     def testParse(self):
         print("\nAssert the files are correctly parsed")

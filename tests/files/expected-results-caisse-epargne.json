@@ -145,8 +145,8 @@
     },
     {
         "account": "COMPTE DE DEPOT JOINT - N° 16275 00800 04012186142",
-        "date": "14/02/2020",
-        "label": "CB SumUp *BIP TAX FACT",
+        "date": "13/02/2020",
+        "label": "CB SumUp *BIP TAX",
         "value": -60.00
     },
     {
@@ -157,7 +157,7 @@
     },
     {
         "account": "COMPTE DE DEPOT JOINT - N° 16275 00800 04012186142",
-        "date": "15/02/2020",
+        "date": "14/02/2020",
         "label": "CB AREA",
         "value": -20.40
     },
@@ -554,7 +554,7 @@
     {
         "account": "COMPTE DE DEPOT JOINT - N° 16275 00800 04012186142",
         "date": "05/02/2020",
-        "label": "PRLV Square Habitat Pays Basque Prelevement au 05/02/2020 - - Square Habitat Pays Basque",
+        "label": "PRLV Square Habitat Pays Basque Prelevement au 05/02/2020 - - Square Habitat Pays Basq ue",
         "value": -604.85
     },
     {
