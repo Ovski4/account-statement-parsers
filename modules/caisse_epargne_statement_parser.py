@@ -182,8 +182,8 @@ class CaisseEpargneStatementParser:
 
     def linesAreWithinBoundaries(self, line1, line2):
         if (
-                (line1['x0']-line2['x0'] >= -2.7 and line2['x1']-line1['x1'] >= -2.7) or
-                (line2['x0']-line1['x0'] >= -2.7 and line1['x1']-line2['x1'] >= -2.7)
+            (line1['x0']-line2['x0'] >= -2.7 and line2['x1']-line1['x1'] >= -2.7) or
+            (line2['x0']-line1['x0'] >= -2.7 and line1['x1']-line2['x1'] >= -2.7)
         ):
             return True
         else:
