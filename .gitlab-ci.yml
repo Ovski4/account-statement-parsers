@@ -22,12 +22,12 @@ tests:
 build:
   stage: build
   script:
-    - docker build --pull -t ovski/ccm-statement-parser:latest .
+    - docker build --pull -t ovski/account-statement-parser:latest .
 
 push:
   stage: push
   script:
-    - docker build --pull -t ovski/ccm-statement-parser:latest .
-    - docker push ovski/ccm-statement-parser:latest
+    - docker build --pull -t ovski/account-statement-parser:latest .
+    - docker push ovski/account-statement-parser:latest
   only:
     - master
