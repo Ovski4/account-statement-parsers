@@ -13,7 +13,6 @@ def parse(file_path, parser_name):
     pdfFile = open(file_path, 'rb')
     lines = PdfParser().parse(pdfFile)
     pdfFile.close()
-
     if (parser_name == 'credit-mutuel'):
         parser = CreditMutuelStatementParser(lines)
     elif (parser_name == 'caisse-epargne'):
@@ -26,17 +25,13 @@ def parse(file_path, parser_name):
     return transactions
 
 def generate_response(request, parser_name):
-    file_path = request.args[b'statement'][0] 
-    transactions = parse(file_path, 'credit-mutuel')
+    file_path = request.args[b'statement'][0]
+    transactions = parse(file_path, parser_name)
 
     return json.dumps(transactions, indent=2, ensure_ascii=False)
 
-@route('/credit-mutuel/')
-def statement(request):
-    return generate_response(request, 'credit-mutuel')
-
-@route('/caisse-epargne/')
-def statement(request):
-    return generate_response(request, 'caisse-epargne')
+@route('/<parser_name>')
+def statement(request, parser_name):
+    return generate_response(request, parser_name)
 
 run('0.0.0.0', 80)
