@@ -65,7 +65,14 @@ class CaisseEpargneStatementParser:
         return bool(re.match(r"^au\s\d+/\d+/\d+\s-\sN°\s\d+$", line[0]['value']))
 
     def getStatementYear(self, line):
-        return re.search(r'^au\s\d+/\d+/(\d+)\s-\sN°\s\d+$', line[0]['value']).group(1)
+        matches = re.search(r'^au\s\d+/(\d+)/(\d+)\s-\sN°\s\d+$', line[0]['value'])
+        year = int(matches.group(2))
+        month = int(matches.group(1))
+
+        if month == 1:
+            return str(year - 1)
+        else:
+            return str(year)
 
     def isDebitLine(self, line):
         # we just check the first one

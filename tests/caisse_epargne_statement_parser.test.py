@@ -116,7 +116,10 @@ class TestCaisseEpargneStatementParser(unittest.TestCase):
                 {'value': 'au 01/03/2020 - N° 36'}
             ],
             [
-                {'value': 'au 05/05/1999 - N° 37'}
+                {'value': 'au 02/05/1999 - N° 37'}
+            ],
+            [
+                {'value': 'au 01/01/1999 - N° 38'}
             ]
         ]
 
@@ -124,6 +127,7 @@ class TestCaisseEpargneStatementParser(unittest.TestCase):
         parser = CaisseEpargneStatementParser(lines)
         self.assertEqual(parser.getStatementYear(lines[0]), '2020')
         self.assertEqual(parser.getStatementYear(lines[1]), '1999')
+        self.assertEqual(parser.getStatementYear(lines[2]), '1998')
 
     def testParse(self):
         print("\nAssert the files are correctly parsed")
