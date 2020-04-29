@@ -106,9 +106,26 @@ class TestCaisseEpargneStatementParser(unittest.TestCase):
             {'value': '3,80', 'x0': 468.3, 'x1': 481.92, 'y0': 592.14, 'y1': 584.05}
         ]
 
+        line2 = [
+            {'value': '03/09', 'x0': 142.5, 'x1': 160.03, 'y0': 129.84, 'y1': 121.75},
+            {'value': 'CB REGISTRAIRE FACT 290819 (', 'x0': 171.0, 'x1': 287.5, 'y0': 129.84, 'y1': 121.75},
+            {'value': 'E', 'x0': 287.5, 'x1': 291.1, 'y0': 123.2, 'y1': 123.2},
+            {'value': 'N', 'x0': 291.1, 'x1': 296.5, 'y0': 123.2, 'y1': 123.2},
+            {'value': 'C', 'x0': 298.15, 'x1': 302.95, 'y0': 123.2, 'y1': 123.2},
+            {'value': 'A', 'x0': 302.95, 'x1': 307.45, 'y0': 123.2, 'y1': 123.2},
+            {'value': 'D', 'x0': 307.45, 'x1': 312.55, 'y0': 123.2, 'y1': 123.2},
+            {'value': '9', 'x0': 314.2, 'x1': 317.8, 'y0': 123.2, 'y1': 123.2},
+            {'value': ',', 'x0': 317.8, 'x1': 319.3, 'y0': 123.2, 'y1': 123.2},
+            {'value': '0', 'x0': 319.3, 'x1': 322.9, 'y0': 123.2, 'y1': 123.2},
+            {'value': '0', 'x0': 322.9, 'x1': 326.5, 'y0': 123.2, 'y1': 123.2},
+            {'value': ')', 'x0': 326.5, 'x1': 328.6, 'y0': 123.2, 'y1': 123.2},
+            {'value': '6,13', 'x0': 468.3, 'x1': 481.92, 'y0': 129.84, 'y1': 121.75}
+        ]
+
         parser = CaisseEpargneStatementParser([line1])
         parser.setColumnBoundaries(headerTableLine)
         self.assertEqual(parser.isDebitLine(line1), True)
+        self.assertEqual(parser.isDebitLine(line2), True)
 
     def testGetStatementYear(self):
         lines = [

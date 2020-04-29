@@ -75,12 +75,11 @@ class CaisseEpargneStatementParser:
             return str(year)
 
     def isDebitLine(self, line):
-        # we just check the first one
-        for index, word in enumerate(line[1:(len(line)-1)]):
-            if index >= 2:
-                break
-            elif not self.linesAreWithinBoundaries(word, self.currentColumnBoundaries['détail des opérations en euros']):
-                return False
+        if len(line) < 3:
+            return False
+        # we check only the second word
+        if not self.linesAreWithinBoundaries(line[1], self.currentColumnBoundaries['détail des opérations en euros']):
+            return False
 
         if (
             self.linesAreWithinBoundaries(line[0], self.currentColumnBoundaries['date']) and
@@ -92,11 +91,11 @@ class CaisseEpargneStatementParser:
             return False
 
     def isCreditLine(self, line):
-        for index, word in enumerate(line[1:(len(line)-1)]):
-            if index >= 2:
-                break
-            elif not self.linesAreWithinBoundaries(word, self.currentColumnBoundaries['détail des opérations en euros']):
-                return False
+        if len(line) < 3:
+            return False
+        # we check only the second word
+        if not self.linesAreWithinBoundaries(line[1], self.currentColumnBoundaries['détail des opérations en euros']):
+            return False
 
         if (
             self.linesAreWithinBoundaries(line[0], self.currentColumnBoundaries['date']) and
