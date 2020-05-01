@@ -181,8 +181,8 @@ class CaisseEpargneStatementParser:
     def cleanLabel(self, label):
         label = label.split('-Réf.')[0].strip()
 
-        if bool(re.match(r"^.*\s+FACT\s\d{6}$", label)):
-            label = re.search(r"^(.*)\s+FACT\s\d{6}$", label).group(1)
+        if bool(re.match(r"^.*\s+FACT\s\d{6}.*$", label)):
+            label = re.search(r"^(.*)\s+FACT\s\d{6}.*$", label).group(1)
 
         return label
 
