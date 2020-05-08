@@ -1,9 +1,13 @@
 import sys
+import json
+import unittest
+
 sys.path.append('./modules')
 from caisse_epargne_statement_parser import CaisseEpargneStatementParser
 from pdf_parser import PdfParser
-import json
-import unittest
+
+sys.path.append('./tests/files')
+from releve_caisse_epargne import caisse_epargne_lines
 
 # import ptvsd
 # ptvsd.enable_attach(address = ('0.0.0.0', 3000))
@@ -64,15 +68,15 @@ class TestCaisseEpargneStatementParser(unittest.TestCase):
 
         line1 = [
             {'value': '06/02', 'x0': 141.6, 'x1': 159.13, 'y0': 409.14, 'y1': 401.05},
-            {'value': 'VIR SEPA DECATHLON', 'x0': 170.1, 'x1': 251.13, 'y0': 409.14, 'y1': 401.05},
-            {'value': 'Vir DECATHLON SE', 'x0': 170.1, 'x1': 235.05, 'y0': 400.74, 'y1': 392.65},
+            {'value': 'VIR SEPA BRICODEPOT', 'x0': 170.1, 'x1': 251.13, 'y0': 409.14, 'y1': 401.05},
+            {'value': 'Vir BRICODEPOT SE', 'x0': 170.1, 'x1': 235.05, 'y0': 400.74, 'y1': 392.65},
             {'value': '76,00', 'x0': 545.4, 'x1': 562.91, 'y0': 409.14, 'y1': 401.05}
         ]
 
         line2 = [
             {'value': '17/02', 'x0': 141.6, 'x1': 159.13, 'y0': 350.34, 'y1': 342.25},
-            {'value': 'VIR SEPA DECATHLON', 'x0': 170.1, 'x1': 251.13, 'y0': 350.34, 'y1': 342.25},
-            {'value': 'Vir DECATHLON SE', 'x0': 170.1, 'x1': 235.05, 'y0': 341.94, 'y1': 333.85},
+            {'value': 'VIR SEPA BRICODEPOT', 'x0': 170.1, 'x1': 251.13, 'y0': 350.34, 'y1': 342.25},
+            {'value': 'Vir BRICODEPOT SE', 'x0': 170.1, 'x1': 235.05, 'y0': 341.94, 'y1': 333.85},
             {'value': '7,00', 'x0': 549.6, 'x1': 563.22, 'y0': 350.34, 'y1': 342.25}
         ]
 
@@ -148,11 +152,7 @@ class TestCaisseEpargneStatementParser(unittest.TestCase):
 
     def testParse(self):
         print("\nAssert the files are correctly parsed")
-
-        pdfFile = open('./tests/files/releve-caisse-epargne.pdf', 'rb')
-        self.lines = PdfParser().parse(pdfFile)
-        pdfFile.close()
-        parser = CaisseEpargneStatementParser(self.lines)
+        parser = CaisseEpargneStatementParser(caisse_epargne_lines)
         transactions = parser.parse()
         with open('./tests/files/expected-results-caisse-epargne.json') as file:
             expectedData = json.loads(file.read())

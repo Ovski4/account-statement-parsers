@@ -1,9 +1,13 @@
 import sys
+import json
+import unittest
+
 sys.path.append('./modules')
 from credit_mutuel_statement_parser import CreditMutuelStatementParser
 from pdf_parser import PdfParser
-import json
-import unittest
+
+sys.path.append('./tests/files')
+from releve_credit_mutuel import credit_mutuel_lines_1, credit_mutuel_lines_2
 
 # import ptvsd
 # ptvsd.enable_attach(address = ('0.0.0.0', 3000))
@@ -14,19 +18,13 @@ class TestCreditMutuelStatementParser(unittest.TestCase):
     def testParse(self):
         print("\nAssert the files are correctly parsed")
 
-        pdfFile = open('./tests/files/releve-credit-mutuel-1.pdf', 'rb')
-        self.lines = PdfParser().parse(pdfFile)
-        pdfFile.close()
-        ccmparser = CreditMutuelStatementParser(self.lines)
+        ccmparser = CreditMutuelStatementParser(credit_mutuel_lines_1)
         transactions = ccmparser.parse()
         with open('./tests/files/expected-results-credit-mutuel-1.json') as file:
             expectedData = json.loads(file.read())
         self.assertEqual(transactions, expectedData)
 
-        pdfFile = open('./tests/files/releve-credit-mutuel-2.pdf', 'rb')
-        self.lines = PdfParser().parse(pdfFile)
-        pdfFile.close()
-        ccmparser = CreditMutuelStatementParser(self.lines)
+        ccmparser = CreditMutuelStatementParser(credit_mutuel_lines_2)
         transactions = ccmparser.parse()
         with open('./tests/files/expected-results-credit-mutuel-2.json') as file:
             expectedData = json.loads(file.read())
@@ -35,30 +33,30 @@ class TestCreditMutuelStatementParser(unittest.TestCase):
     def testExtractAccountName(self):
         print("\nAssert the account name is correctly extracted")
         accountLines = [
-            [{'value': 'C/C EUROCOMPTE JEUNE N° 00020324201 en euros', 'x0': 81.6, 'y0': 514.55, 'x1': 331.79, 'y1': 502.65}],
-            [{'value': 'LIVRET BLEU N° 00020324203 en euros', 'x0': 81.6, 'y0': 694.55, 'x1': 269.56, 'y1': 682.65}]
+            [{'value': 'C/C EUROCOMPTE JEUNE N° 22020325207 en euros', 'x0': 81.6, 'y0': 514.55, 'x1': 331.79, 'y1': 502.65}],
+            [{'value': 'LIVRET BLEU N° 11111324203 en euros', 'x0': 81.6, 'y0': 694.55, 'x1': 269.56, 'y1': 682.65}]
         ]
 
         ccmParser = CreditMutuelStatementParser(accountLines)
-        self.assertEqual(ccmParser.extractAccountName(accountLines[0]), 'C/C EUROCOMPTE JEUNE N° 00020324201')
-        self.assertEqual(ccmParser.extractAccountName(accountLines[1]), 'LIVRET BLEU N° 00020324203')
+        self.assertEqual(ccmParser.extractAccountName(accountLines[0]), 'C/C EUROCOMPTE JEUNE N° 22020325207')
+        self.assertEqual(ccmParser.extractAccountName(accountLines[1]), 'LIVRET BLEU N° 11111324203')
 
     def testIsAccountNameLine(self):
         print("\nAssert the line is an account name line")
 
         accountLines = [
             [
-                {'value': 'C/C EUROCOMPTE JEUNE N° 00020324201 en dollars', 'x0': 81.6, 'x1': 331.79, 'y0': 514.55, 'y1': 502.65}
+                {'value': 'C/C EUROCOMPTE JEUNE N° 22020325207 en dollars', 'x0': 81.6, 'x1': 331.79, 'y0': 514.55, 'y1': 502.65}
             ],
             [
-                {'value': 'C/C EUROCOMPTE JEUNE N° 00020324201 en euros', 'x0': 81.6, 'x1': 331.79, 'y0': 514.55, 'y1': 502.65}
+                {'value': 'C/C EUROCOMPTE JEUNE N° 22020325207 en euros', 'x0': 81.6, 'x1': 331.79, 'y0': 514.55, 'y1': 502.65}
             ],
             [
-                {'value': 'TITULAIRE(S) : M BAPTISTE BOUCHEREAU', 'x0': 81.6, 'x1': 291.04, 'y0': 502.55, 'y1': 490.65},
+                {'value': 'TITULAIRE(S) : M BOB LENON', 'x0': 81.6, 'x1': 291.04, 'y0': 502.55, 'y1': 490.65},
                 {'value': 'IBAN : FR76 1027 8072 2800 0203 2420 139', 'x0': 370.8, 'x1': 532.67, 'y0': 500.58, 'y1': 491.06}
             ],
             [
-                {'value': 'C/C EUROCOMPTE JEUNE N° 00020324201 en euros', 'x0': 81.6, 'x1': 331.79, 'y0': 514.55, 'y1': 502.65}
+                {'value': 'C/C EUROCOMPTE JEUNE N° 22020325207 en euros', 'x0': 81.6, 'x1': 331.79, 'y0': 514.55, 'y1': 502.65}
             ],
             [
                 {'value': 'WRONG', 'x0': 81.6, 'x1': 291.04, 'y0': 502.55, 'y1': 490.65},

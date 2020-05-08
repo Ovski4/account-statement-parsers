@@ -10,7 +10,7 @@ import unittest
 class TestPdfParser(unittest.TestCase):
 
     def setUp(self):
-        pdfFile = open('./tests/files/releve-credit-mutuel-1.pdf', 'rb')
+        pdfFile = open('./tests/files/test.pdf', 'rb')
         self.pdfParser = PdfParser()
         self.lines = self.pdfParser.parse(pdfFile)
         pdfFile.close()
@@ -19,8 +19,8 @@ class TestPdfParser(unittest.TestCase):
         print("\nAssert the line contain one suite of words")
         self.assertEqual(len(self.lines[0]), 1)
 
-        print("\nAssert the suite of words is CCM SAINT CHAMOND")
-        self.assertEqual(self.lines[0][0]['value'], 'CCM SAINT CHAMOND')
+        print("\nAssert the suite of words is Text here")
+        self.assertEqual(self.lines[0][0]['value'], 'Text here')
 
 if __name__ == '__main__':
     unittest.main()
