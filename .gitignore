@@ -1,2 +1,4 @@
 __pycache__/
 /files
+/htmlcov/
+.coverage
