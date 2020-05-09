@@ -1,11 +1,13 @@
 import sys
+import os
+
 sys.path.append('./modules')
 from pdf_parser import PdfParser
-import unittest
 
-# import ptvsd
-# ptvsd.enable_attach(address = ('0.0.0.0', 3000))
-# ptvsd.wait_for_attach()
+if os.environ.get('DEBUG') == 'true':
+    import ptvsd
+    ptvsd.enable_attach(address = ('0.0.0.0', 3000))
+    ptvsd.wait_for_attach()
 
 def testFirstLine():
     pdfFile = open('./tests/files/test.pdf', 'rb')

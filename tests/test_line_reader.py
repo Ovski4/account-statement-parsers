@@ -1,11 +1,13 @@
 import sys
+import os
+
 sys.path.append('./modules')
 from line_reader import LineReader
-import unittest
 
-# import ptvsd
-# ptvsd.enable_attach(address = ('0.0.0.0', 3000))
-# ptvsd.wait_for_attach()
+if os.environ.get('DEBUG') == 'true':
+    import ptvsd
+    ptvsd.enable_attach(address = ('0.0.0.0', 3000))
+    ptvsd.wait_for_attach()
 
 def testLineContains():
     line = [
