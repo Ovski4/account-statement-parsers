@@ -72,7 +72,6 @@ class CreditMutuelStatementParser:
             return False
 
     def isDebitLine(self, line):
-        # todo add regexes
         if (
             len(line) == 4 and
             self.linesAreWithinBoundaries(line[0], self.currentColumnBoundaries['date']) and
@@ -85,7 +84,6 @@ class CreditMutuelStatementParser:
             return False
 
     def isCreditLine(self, line):
-        # todo add regexes
         if (
             len(line) == 4 and
             self.linesAreWithinBoundaries(line[0], self.currentColumnBoundaries['date']) and

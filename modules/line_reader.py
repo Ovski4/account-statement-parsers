@@ -1,7 +1,6 @@
 class LineReader:
 
     def __init__(self, line):
-        # Todo check if line is properly formatted
         self.line = line
 
     def contains(self, searchedWord):
