@@ -3,9 +3,9 @@ Usage
 -----
 
 ```bash
-docker-compose run api
+docker-compose run --service-ports api
 
-curl -H "Accept: application/json" -X GET container_api?statement=/path/to/statement.pdf
+curl -H "Accept: application/json" -X GET 127.0.0.1/credit-mutuel?statement=/path/to/statement.pdf
 ```
 
 Tests
@@ -52,7 +52,7 @@ ptvsd.wait_for_attach()
 Run the tests
 
 ```bash
-docker-compose run --service-ports tests
+docker-compose run -e DEBUG=true --service-ports tests
 ```
 
 And only after that, run the debugger in vscode
