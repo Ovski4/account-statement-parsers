@@ -15,8 +15,8 @@ Tests
 docker-compose run tests
 ```
 
-Debug
------
+Debug with vscode
+-----------------
 
 Create the vscode debugger configuration:
 
