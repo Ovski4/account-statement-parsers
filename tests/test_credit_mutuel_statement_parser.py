@@ -15,7 +15,6 @@ if os.environ.get('DEBUG') == 'true':
     ptvsd.wait_for_attach()
 
 def testParse():
-    print("\nAssert the files are correctly parsed")
 
     ccmparser = CreditMutuelStatementParser(credit_mutuel_lines_1)
     transactions = ccmparser.parse()
@@ -30,7 +29,7 @@ def testParse():
     assert transactions == expectedData
 
 def testExtractAccountName():
-    print("\nAssert the account name is correctly extracted")
+
     accountLines = [
         [{'value': 'C/C EUROCOMPTE JEUNE N° 22020325207 en euros', 'x0': 81.6, 'y0': 514.55, 'x1': 331.79, 'y1': 502.65}],
         [{'value': 'LIVRET BLEU N° 11111324203 en euros', 'x0': 81.6, 'y0': 694.55, 'x1': 269.56, 'y1': 682.65}]
@@ -41,7 +40,6 @@ def testExtractAccountName():
     assert ccmParser.extractAccountName(accountLines[1]) == 'LIVRET BLEU N° 11111324203'
 
 def testIsAccountNameLine():
-    print("\nAssert the line is an account name line")
 
     accountLines = [
         [
@@ -71,6 +69,7 @@ def testIsAccountNameLine():
     assert ccmParser.isAccountNameLine(4, accountLines) == False
 
 def testIsHeaderTableLine():
+
     headerTableLines = [
         [
             {'value': 'Date', 'x0': 63.36, 'x1': 80.7, 'y0': 484.98, 'y1': 475.46},
@@ -91,14 +90,12 @@ def testIsHeaderTableLine():
         ]
     ]
 
-    print("\nAssert the line is a header of a table line")
     ccmParser = CreditMutuelStatementParser(headerTableLines)
     assert ccmParser.isHeaderTableLine(headerTableLines[0]) == True
     assert ccmParser.isHeaderTableLine(headerTableLines[1]) == False
     assert ccmParser.isHeaderTableLine(headerTableLines[2]) == False
 
 def testGetColumnBoundaries():
-    print("\nAssert we get the right table column x boundaries from the data")
 
     headerTableLine = [
         {'value': 'Date', 'x0': 63.36, 'x1': 80.7, 'y0': 484.98, 'y1': 475.46},
@@ -135,7 +132,6 @@ def testGetColumnBoundaries():
     assert ccmParser.getColumnBoundaries(headerTableLine) == expectedData
 
 def testLinesAreWithinBoundaries():
-    print("\nAssert 2 lines are within boundaries")
 
     columnBoundaries = {
         'credit': {'x0': 486.96, 'x1': 534.08},
@@ -157,7 +153,6 @@ def testLinesAreWithinBoundaries():
     assert ccmParser.linesAreWithinBoundaries(line[1], columnBoundaries['date']) == True
 
 def testLineIsDebit():
-    print("\nAssert the line is a debit line")
 
     headerTableLine = [
         {'value': 'Date', 'x0': 63.36, 'x1': 80.7, 'y0': 484.98, 'y1': 475.46 },
@@ -179,7 +174,6 @@ def testLineIsDebit():
     assert ccmParser.isDebitLine(line) == True
 
 def testOtherLineIsDebit():
-    print("\nAssert the line is a debit line")
 
     headerTableLine = [
         {'value': 'Date', 'x0': 63.36, 'x1': 80.7, 'y0': 484.98, 'y1': 475.46},
@@ -214,7 +208,6 @@ def testOtherLineIsDebit():
     assert ccmParser.isDebitLine(lines[2]) == False
 
 def testExtractTransaction():
-    print("\nAssert we extract data from transaction lines")
 
     headerTableLine = [
         {'value': 'Date', 'x0': 63.36, 'x1': 80.7, 'y0': 484.98, 'y1': 475.46},

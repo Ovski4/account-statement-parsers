@@ -32,7 +32,7 @@
     {
         "account": "COMPTE DE DEPOT JOINT - N° 16275 00800 02012156349",
         "date": "18/02/2020",
-        "label": "VIR SEPA MLE CLEMENCE BOUCHEREA CADEAU BOB",
+        "label": "VIR SEPA MLE CLEMENCE DUCHEREA CADEAU BOB",
         "value": 13.50
     },
     {
@@ -62,7 +62,7 @@
     {
         "account": "COMPTE DE DEPOT JOINT - N° 16275 00800 02012156349",
         "date": "27/02/2020",
-        "label": "VIR SEPA BRICODEPOT VIREMENT BRICODEPOT 02 2020",
+        "label": "VIR SEPA BRICODEPOT VIREMENT BRICODEPOT 02 2020 REMISE BOB EXC.",
         "value": 2207.71
     },
     {
@@ -596,13 +596,13 @@
     {
         "account": "COMPTE DE DEPOT JOINT - N° 16275 00800 02012156349",
         "date": "24/02/2020",
-        "label": "VIR SEPA M LENON JACK VIREMENT DE MLLE ISSOU MAUD OU M BOUCHE",
+        "label": "VIR SEPA M LENON JACK VIREMENT DE MLLE ISSOU MAUD OU M DUCHE",
         "value": -500.00
     },
     {
         "account": "COMPTE DE DEPOT JOINT - N° 16275 00800 02012156349",
         "date": "24/02/2020",
-        "label": "VIREMENT VERS CLUB DUK VIREMENT DE MLLE ISSOU MAUD OU M BOUCHE",
+        "label": "VIREMENT VERS CLUB DUK VIREMENT DE MLLE ISSOU MAUD OU M DUCHE",
         "value": -130.00
     },
     {
@@ -614,7 +614,7 @@
     {
         "account": "COMPTE DE DEPOT JOINT - N° 16275 00800 02012156349",
         "date": "27/02/2020",
-        "label": "VIR SEPA M LENON JACK VIREMENT DE MLLE ISSOU MAUD OU M BOUCHE",
+        "label": "VIR SEPA M LENON JACK VIREMENT DE MLLE ISSOU MAUD OU M DUCHE",
         "value": -500.00
     }
 ]

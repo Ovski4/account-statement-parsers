@@ -1,6 +1,7 @@
 import sys
 import json
 import os
+import pytest
 
 sys.path.append('./modules')
 from caisse_epargne_statement_parser import CaisseEpargneStatementParser
@@ -15,6 +16,7 @@ if os.environ.get('DEBUG') == 'true':
     ptvsd.wait_for_attach()
 
 def testIsHeaderTableLine():
+
     headerTableLines = [
         [
             {'value': 'Date', 'x0': 142.5, 'x1': 157.28, 'y0': 477.24, 'y1': 469.15},
@@ -34,13 +36,25 @@ def testIsHeaderTableLine():
         ]
     ]
 
-    print("\nAssert the line is a header of a table line")
     parser = CaisseEpargneStatementParser(headerTableLines)
     assert parser.isHeaderTableLine(headerTableLines[0]) == True
     assert parser.isHeaderTableLine(headerTableLines[1]) == False
     assert parser.isHeaderTableLine(headerTableLines[2]) == False
 
+def testExtractAccountNameRaiseError():
+
+    lines = [
+       {'value': 'first line', 'x0': 142.5, 'y0': 756.46, 'x1': 312.5, 'y1': 746.34},
+       {'value': 'second line', 'x0': 142.5, 'y0': 748.66, 'x1': 402.81, 'y1': 738.54},
+       {'value': 'third line', 'x0': 142.5, 'y0': 748.66, 'x1': 402.81, 'y1': 738.54}
+    ]
+
+    parser = CaisseEpargneStatementParser(lines)
+    with pytest.raises(Exception):
+        parser.extractAccountName(lines[0])
+
 def testIsDateLine():
+
     lines = [
         [
             {'value': 'au 01/03/2020 - N° 36'}
@@ -50,13 +64,11 @@ def testIsDateLine():
         ]
     ]
 
-    print("\nAssert the line is a date line")
     parser = CaisseEpargneStatementParser(lines)
     assert parser.isDateLine(lines[0]) == True
     assert parser.isDateLine(lines[1]) == False
 
 def testLineIsCredit():
-    print("\nAssert the line is a credit line")
 
     headerTableLine = [
         {'value': 'Date', 'x0': 142.5,'x1': 157.28, 'y0': 477.24, 'y1': 469.15},
@@ -94,7 +106,6 @@ def testLineIsCredit():
     assert parser.isCreditLine(line3) == True
 
 def testLineIsDebit():
-    print("\nAssert the line is a debit line")
 
     headerTableLine = [
         {'value': 'Date', 'x0': 142.5, 'x1': 157.28, 'y0': 731.94, 'y1': 723.85},
@@ -131,6 +142,7 @@ def testLineIsDebit():
     assert parser.isDebitLine(line2) == True
 
 def testGetStatementYear():
+
     lines = [
         [
             {'value': 'au 01/03/2020 - N° 36'}
@@ -143,14 +155,13 @@ def testGetStatementYear():
         ]
     ]
 
-    print("\nAssert the statement year is correctly retrieved")
     parser = CaisseEpargneStatementParser(lines)
     assert parser.getStatementYear(lines[0]) == '2020'
     assert parser.getStatementYear(lines[1]) == '1999'
     assert parser.getStatementYear(lines[2]) == '1998'
 
 def testParse():
-    print("\nAssert the files are correctly parsed")
+
     parser = CaisseEpargneStatementParser(caisse_epargne_lines)
     transactions = parser.parse()
     with open('./tests/files/expected-results-caisse-epargne.json') as file:

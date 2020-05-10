@@ -716,7 +716,7 @@ caisse_epargne_lines = [
     'x1': 93.53,
     'y1': 531.25
   }, {
-    'value': 'MLLE ISSOU MAUD OU M BOUCHE',
+    'value': 'MLLE ISSOU MAUD OU M DUCHE',
     'x0': 155.7,
     'y0': 536.66,
     'x1': 286.9,
@@ -760,7 +760,7 @@ caisse_epargne_lines = [
     'x1': 110.66,
     'y1': 500.05
   }, {
-    'value': 'MLLE ISSOU MAUD OU M BOUCHE',
+    'value': 'MLLE ISSOU MAUD OU M DUCHE',
     'x0': 142.5,
     'y0': 501.16,
     'x1': 312.5,
@@ -1033,7 +1033,7 @@ caisse_epargne_lines = [
     'x1': 159.13,
     'y1': 275.05
   }, {
-    'value': 'VIR SEPA MLE CLEMENCE BOUCHEREA',
+    'value': 'VIR SEPA MLE CLEMENCE DUCHEREA',
     'x0': 170.1,
     'y0': 283.14,
     'x1': 309.48,
@@ -1233,43 +1233,6 @@ caisse_epargne_lines = [
     'y0': 144.84,
     'x1': 561.84,
     'y1': 136.75
-  }],
-  [{
-    'value': '0',
-    'x0': 14.1,
-    'y0': 129.92,
-    'x1': 14.1,
-    'y1': 127.22
-  }, {
-    'value': '0',
-    'x0': 14.1,
-    'y0': 127.22,
-    'x1': 14.1,
-    'y1': 124.52
-  }, {
-    'value': '1',
-    'x0': 14.1,
-    'y0': 124.52,
-    'x1': 14.1,
-    'y1': 121.82
-  }, {
-    'value': '9',
-    'x0': 14.1,
-    'y0': 121.82,
-    'x1': 14.1,
-    'y1': 119.12
-  }, {
-    'value': "-Réf. donneur d'ordre :",
-    'x0': 170.1,
-    'y0': 128.69,
-    'x1': 235.9,
-    'y1': 119.44
-  }, {
-    'value': 'I0000023902016',
-    'x0': 241.5,
-    'y0': 127.74,
-    'x1': 294.04,
-    'y1': 119.65
   }],
   [{
     'value': '5',
@@ -5377,7 +5340,7 @@ caisse_epargne_lines = [
     'y1': 776.34
   }],
   [{
-    'value': 'MLLE ISSOU MAUD OU M BOUCHE',
+    'value': 'MLLE ISSOU MAUD OU M DUCHE',
     'x0': 142.5,
     'y0': 756.46,
     'x1': 312.5,
@@ -5413,6 +5376,13 @@ caisse_epargne_lines = [
     'y0': 731.94,
     'x1': 561.67,
     'y1': 723.85
+  }],
+  [{
+    'value': 'REMISE BOB EXC.',
+    'x0': 170.1,
+    'y0': 136.44,
+    'x1': 278.63,
+    'y1': 128.35
   }],
   [{
     'value': 'Paiements',
@@ -10925,7 +10895,7 @@ caisse_epargne_lines = [
     'y1': 776.34
   }],
   [{
-    'value': 'MLLE ISSOU MAUD OU M BOUCHE',
+    'value': 'MLLE ISSOU MAUD OU M DUCHE',
     'x0': 142.5,
     'y0': 756.46,
     'x1': 312.5,
@@ -15940,7 +15910,7 @@ caisse_epargne_lines = [
     'y1': 776.34
   }],
   [{
-    'value': 'MLLE ISSOU MAUD OU M BOUCHE',
+    'value': 'MLLE ISSOU MAUD OU M DUCHE',
     'x0': 142.5,
     'y0': 756.46,
     'x1': 312.5,
@@ -16416,7 +16386,7 @@ caisse_epargne_lines = [
     'x1': 298.18,
     'y1': 380.95
   }, {
-    'value': 'VIREMENT DE MLLE ISSOU MAUD OU M BOUCHE',
+    'value': 'VIREMENT DE MLLE ISSOU MAUD OU M DUCHE',
     'x0': 170.1,
     'y0': 380.64,
     'x1': 357.57,
@@ -16454,7 +16424,7 @@ caisse_epargne_lines = [
     'x1': 268.23,
     'y1': 350.95
   }, {
-    'value': 'VIREMENT DE MLLE ISSOU MAUD OU M BOUCHE',
+    'value': 'VIREMENT DE MLLE ISSOU MAUD OU M DUCHE',
     'x0': 170.1,
     'y0': 350.64,
     'x1': 357.57,
@@ -16536,7 +16506,7 @@ caisse_epargne_lines = [
     'x1': 298.18,
     'y1': 291.25
   }, {
-    'value': 'VIREMENT DE MLLE ISSOU MAUD OU M BOUCHE',
+    'value': 'VIREMENT DE MLLE ISSOU MAUD OU M DUCHE',
     'x0': 170.1,
     'y0': 290.64,
     'x1': 357.57,
@@ -16684,7 +16654,7 @@ caisse_epargne_lines = [
     'y1': 224.04
   }],
   [{
-    'value': 'MLLE ISSOU MAUD OU M BOUCHE',
+    'value': 'MLLE ISSOU MAUD OU M DUCHE',
     'x0': 154.8,
     'y0': 214.76,
     'x1': 286.0,

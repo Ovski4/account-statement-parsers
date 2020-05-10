@@ -118,7 +118,7 @@ class CaisseEpargneStatementParser:
 
     def extractAccountName(self, line):
         if (len(line) > 2):
-            raise Exception('Unexpected pdf format. The line above the header line contains multiple lines')
+            raise Exception('Unexpected pdf format. The line above the header line contains multiple words')
         elif (len(line) == 2) and line[1]['value'].endswith(' (suite)'):
             return self.currentAccount
         else:
