@@ -1,6 +1,16 @@
+Account statement parsers
+=========================
+
+This repo provides modules used to extract transactions from account statement pdf files.
+
+Currently support :
+ - **Crédit Mutuel** account statement files
+ - **Caisse d'Épargne** account statement files
 
 Usage
 -----
+
+The run_api.py script runs a simple http server that will return transactions as JSON.
 
 ```bash
 docker-compose run --service-ports api
@@ -41,18 +51,10 @@ Create the vscode debugger configuration:
 }
 ```
 
-Uncomment these lines in your test files:
-
-```py
-import ptvsd
-ptvsd.enable_attach(address = ('0.0.0.0', 3000))
-ptvsd.wait_for_attach()
-```
-
 Run the tests
 
 ```bash
 docker-compose run -e DEBUG=true --service-ports tests
 ```
 
-And only after that, run the debugger in vscode
+And **only after that**, run the debugger in vscode
