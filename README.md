@@ -8,6 +8,7 @@ This repo provides modules used to extract transactions from account statement p
 Currently support :
  - **Crédit Mutuel** account statement files
  - **Caisse d'Épargne** account statement files
+ - **N26** account statement files
 
 Usage
 -----

@@ -6,6 +6,7 @@ from datetime import datetime
 sys.path.append('modules')
 from credit_mutuel_statement_parser import CreditMutuelStatementParser
 from caisse_epargne_statement_parser import CaisseEpargneStatementParser
+from n26_statement_parser import N26StatementParser
 from pdf_parser import PdfParser
 from klein import run, route
 
@@ -17,6 +18,8 @@ def parse(file_path, parser_name):
         parser = CreditMutuelStatementParser(lines)
     elif (parser_name == 'caisse-epargne'):
         parser = CaisseEpargneStatementParser(lines)
+    elif (parser_name == 'n26'):
+        parser = N26StatementParser(lines)
     else:
         raise Exception('Unknown parser with name' + parser_name)
 
