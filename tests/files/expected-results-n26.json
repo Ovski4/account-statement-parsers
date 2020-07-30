@@ -3,24 +3,24 @@
         "account": "HECTOR MALONDA N26",
         "date": "17/07/2020",
         "label": "M HECTOR MALONDA - VIR DE M HECTOR MALONDA VH019731XSUC7601",
-        "value": 227.65
+        "value": 200.0
     },
     {
         "account": "HECTOR MALONDA N26",
-        "date": "25/07/2020",
+        "date": "29/07/2020",
         "label": "NANTES MANGIN",
-        "value": 76.00
+        "value": -30.0
     },
     {
         "account": "HECTOR MALONDA N26",
-        "date": "27/07/2020",
-        "label": "LIDL 3876",
-        "value": 61.27
-    },
-    {
-        "account": "HECTOR MALONDA N26",
-        "date": "28/07/2020",
+        "date": "29/07/2020",
         "label": "M MALONDA HECTOR - VIR DE M MALONDA HECTOR VH021048W106L201",
-        "value": 7.00
+        "value": 400.0
+    },
+    {
+        "account": "HECTOR MALONDA N26",
+        "date": "29/07/2020",
+        "label": "LIDL 3876",
+        "value": -3.44
     }
 ]
