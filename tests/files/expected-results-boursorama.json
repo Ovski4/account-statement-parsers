@@ -1,0 +1,26 @@
+[
+    {
+        "account": "40618 83333 00340977444 58",
+        "date": "18/08/2020",
+        "label": "VIR VIREMENT CREATION COMPTE - BOURSORAMA",
+        "value": 300
+    },
+    {
+        "account": "40618 83333 00340977444 58",
+        "date": "18/08/2020",
+        "label": "BRS80",
+        "value": 80
+    },
+    {
+        "account": "40618 83333 00340977444 58",
+        "date": "28/08/2020",
+        "label": "VIR SEPA M SALAMENCO HECTOR - VIR DE M SALAMENCO HECTOR - VH024041KHHH6111 - Réf : VH024041KHHH6111",
+        "value": 1473
+    },
+    {
+        "account": "40618 83333 00340977444 58",
+        "date": "31/08/2020",
+        "label": "VIR SEPA MLLE DEBONARD HELENE - Virement depuis Ma Banque - Réf : DDDDFRPP847C0120230829105811111",
+        "value": 700
+    }
+]
