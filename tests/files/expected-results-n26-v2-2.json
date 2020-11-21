@@ -1,0 +1,116 @@
+[
+    {
+        "account": "HECTOR MALONDA N26",
+        "date": "01/10/2020",
+        "label": "Bob Henry - IBAN: DE59100110012625952100 • BIC: NTSBDEB1XXX",
+        "value": 14.0
+    },
+    {
+        "account": "HECTOR MALONDA N26",
+        "date": "02/10/2020",
+        "label": "M MALONDA HECTOR - IBAN: FR7610278072280002032420139 • BIC: CMCIFR2AXXX - VIREMENT DEPUIS COMPTE CREDIT MUTUEL - VH02753MZ01W6J01",
+        "value": 400.0
+    },
+    {
+        "account": "HECTOR MALONDA N26",
+        "date": "02/10/2020",
+        "label": "Vers Okazou",
+        "value": -300.0
+    },
+    {
+        "account": "HECTOR MALONDA N26",
+        "date": "02/10/2020",
+        "label": "KIMSUFI",
+        "value": -31.18
+    },
+    {
+        "account": "HECTOR MALONDA N26",
+        "date": "03/10/2020",
+        "label": "K0030",
+        "value": -8.6
+    },
+    {
+        "account": "HECTOR MALONDA N26",
+        "date": "05/10/2020",
+        "label": "Wikipedia Gift",
+        "value": -10.0
+    },
+    {
+        "account": "HECTOR MALONDA N26",
+        "date": "05/10/2020",
+        "label": "AMZN Mktp FR*JP12T6RZ5",
+        "value": -36.47
+    },
+    {
+        "account": "HECTOR MALONDA N26",
+        "date": "08/10/2020",
+        "label": "IZUSHI",
+        "value": -19.8
+    },
+    {
+        "account": "HECTOR MALONDA N26",
+        "date": "08/10/2020",
+        "label": "LE PETIT BAIGNEUR",
+        "value": -9.25
+    },
+    {
+        "account": "HECTOR MALONDA N26",
+        "date": "09/10/2020",
+        "label": "Parrainage NUMBER26 - Merci de nous aider à révolutionner la banque.",
+        "value": 15
+    },
+    {
+        "account": "HECTOR MALONDA N26",
+        "date": "09/10/2020",
+        "label": "ALTISSIMO",
+        "value": -120
+    },
+    {
+        "account": "HECTOR MALONDA N26",
+        "date": "15/10/2020",
+        "label": "LIDL 3876",
+        "value": -3.44
+    },
+    {
+        "account": "HECTOR MALONDA N26",
+        "date": "15/10/2020",
+        "label": "LA POSTE BOUTIQU",
+        "value": -4.8
+    },
+    {
+        "account": "HECTOR MALONDA N26",
+        "date": "15/10/2020",
+        "label": "ANTOINE LE BOULANGE",
+        "value": -6.0
+    },
+    {
+        "account": "HECTOR MALONDA N26",
+        "date": "21/10/2020",
+        "label": "SARL 2 L",
+        "value": -23.0
+    },
+    {
+        "account": "HECTOR MALONDA N26",
+        "date": "23/10/2020",
+        "label": "NANTES MANGIN",
+        "value": -20.0
+    },
+    {
+        "account": "HECTOR MALONDA N26",
+        "date": "24/10/2020",
+        "label": "STEAMGAMES.COM",
+        "value": -4.99
+    },
+    {
+        "account": "HECTOR MALONDA N26",
+        "date": "31/10/2020",
+        "label": "LE MALALA",
+        "value": -24.95
+    },
+    {
+        "account": "HECTOR MALONDA N26",
+        "date": "02/10/2020",
+        "label": "De Compte courant",
+        "value": 300
+    }
+]
