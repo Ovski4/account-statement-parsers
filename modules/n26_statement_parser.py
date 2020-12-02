@@ -7,98 +7,154 @@ from pdf_parser import PdfParser
 class N26StatementParser:
 
     def __init__(self, lines):
-        self.dateRegex  = re.compile(
-            r'(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche), '
-            r'(\d+)\. '
-            r'(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)'
-            r' (\d+)'
-        )
-        self.valueRegex = r'(-|\+)(\d+),(\d{2})€'
-        self.months = {
-            'janvier': '01',
-            'février': '02',
-            'mars': '03',
-            'avril': '04',
-            'mai': '05',
-            'juin': '06',
-            'juillet': '07',
-            'août': '08',
-            'septembre': '09',
-            'octobre': '10',
-            'novembre': '11',
-            'décembre': '12',
-        }
         self.lines = lines
         self.account = None
-        # self.valueRightPosition = None
-        self.currentDate = None
-        self.currentTransactionLabel = None
+        self.currentColumnBoundaries = None
+
+    def setColumnBoundaries(self, line):
+        self.currentColumnBoundaries = self.getColumnBoundaries(line)
 
     def parse(self):
         transactions = []
 
         for index, line in enumerate(self.lines):
-            if index == 0:
+            if self.isHeaderTableLine(line):
+                self.setColumnBoundaries(line)
+                continue
+
+            if self.isAccountLine(line) and self.account is None:
                 self.account = line[0]['value'] + ' N26'
+                self.setAccountOnTransactions(transactions)
                 continue
 
-            # if line[0]['value'] == 'Solde':
-            #     self.valueRightPosition = line[0]['x1']
-            #     continue
-
-            if self.isDateLine(line):
-                self.currentDate = self.extractDateFromLine(line)
+            if (self.currentColumnBoundaries is not None and self.isAmountLine(line)):
+                transactions.append(self.extractTransaction(index, self.lines))
                 continue
 
-            if self.currentDate is not None:
-
-                if self.lineIsTransactionLabel(line):
-                    self.currentTransactionLabel = line[0]['value']
-
-                if self.lineHasTransactionValue(line) and self.currentTransactionLabel is not None:
-                    transactions.append({
-                        'account': self.account,
-                        'date': self.currentDate,
-                        'label': self.currentTransactionLabel,
-                        'value': float(self.extractTransactionValue(line))
-                    })
-                    self.currentTransactionLabel = None
-
-            if line[0]['value'].startswith('VIR DE M'):
-                transactions[-1]['label'] = transactions[-1]['label'] + ' - ' + line[0]['value']
-
-            if line[0]['value'] == 'Vue d’ensemble':
-                break
+            if (self.currentColumnBoundaries is not None and self.isIncompleteAmountLine(index, self.lines)):
+                transactions.append(self.extractTransactionFromMultipleLines(index, self.lines))
 
         return transactions
 
-    def isDateLine(self, line):
-        return bool(re.match(self.dateRegex, line[0]['value']))
+    def setAccountOnTransactions(self, transactions):
+        for transaction in transactions:
+            transaction['account'] = self.account
 
-    def extractDateFromLine(self, line):
-        matches = re.search(self.dateRegex, line[0]['value'])
-        day = int(matches.group(2))
-        month = matches.group(3)
-        year = int(matches.group(4))
-
-        return str(day) + '/' + self.months[month] + '/' + str(year)
-
-    def lineIsTransactionLabel(self, line):
-        return (line[0]['y0'] - line[0]['y1']) > 13
-
-    def lineHasTransactionValue(self, line):
-        for index, word in enumerate(line):
-            if bool(re.match(self.valueRegex, word['value'])):
-                return True
-
+    def isHeaderTableLine(self, line):
+        if (
+            len(line) == 3 and
+            line[0]['value'].lower() == 'description' and
+            line[1]['value'].lower() == 'date de réservation' and
+            line[2]['value'].lower() == 'montant'
+        ):
+            return True
         return False
 
-    def extractTransactionValue(self, line):
-        for index, word in enumerate(line):
-            if bool(re.match(self.valueRegex, word['value'])):
-                matches = re.search(self.valueRegex, word['value'])
-                sign = matches.group(1)
-                integers = matches.group(2)
-                decimals = matches.group(3)
+    def isAccountLine(self, line):
+        if (
+            len(line) == 2 and
+            line[1]['value'].lower() == 'émis le'
+        ):
+            return True
+        return False
 
-                return float(sign + integers + '.' + decimals)
+    def isIncompleteAmountLine(self, index, lines):
+        if (index + 1 >= len(lines)):
+            return False
+
+        line = lines[index]
+        nextLine = lines[index+1]
+        if (
+            len(line) == 2 and
+            self.linesAreWithinBoundaries(line[0], self.currentColumnBoundaries['date']) and
+            self.linesAreWithinBoundaries(line[1], self.currentColumnBoundaries['amount']) and
+            len(nextLine) == 1 and
+            self.linesAreWithinBoundaries(nextLine[0], self.currentColumnBoundaries['description'])
+        ):
+            return True
+        return False
+
+    def getColumnBoundaries(self, line):
+        boundaries = {}
+        dictionnary = {
+            'description': 'description',
+            'date de réservation': 'date',
+            'montant': 'amount'
+        }
+
+        for word in line:
+            columnHeader = word['value'].lower()
+
+            boundaries[dictionnary[columnHeader]] = {
+                'x0': word['x0'],
+                'x1': word['x1']
+            }
+
+        return boundaries
+
+
+    def extractTransactionFromMultipleLines(self, lineIndex, lines):
+        value = self.extractAmount(lines[lineIndex][1]['value'])
+        label = lines[lineIndex+1][0]['value']
+
+        transaction = {
+            'account': self.account,
+            'date': lines[lineIndex][0]['value'].replace('.', '/'),
+            'label': label,
+            'value': value
+        }
+
+        startIndex = lineIndex + 2
+        for line in lines[startIndex:]:
+            if self.linesAreWithinBoundaries(line[0], self.currentColumnBoundaries['description']) and len(line) == 1:
+                transaction['label'] = transaction.get('label') + ' - ' + line[0]['value']
+            else:
+                break
+
+        return transaction
+
+    def extractTransaction(self, lineIndex, lines):
+        value = self.extractAmount(lines[lineIndex][2]['value'])
+
+        transaction = {
+            'account': self.account,
+            'date': lines[lineIndex][1]['value'].replace('.', '/'),
+            'label': lines[lineIndex][0]['value'],
+            'value': value
+        }
+
+        startIndex = lineIndex + 2 # skip the first line (Mastercard . supermarche, etc)
+        for line in lines[startIndex:]:
+            if self.linesAreWithinBoundaries(line[0], self.currentColumnBoundaries['description']) and len(line) == 1:
+                transaction['label'] = transaction.get('label') + ' - ' + line[0]['value']
+            else:
+                break
+
+        return transaction
+
+    def extractAmount(self, value):
+        value = value.replace('.', '').replace(',', '.')
+        value = value[:-1] # get rid of the currency symbol
+
+        return float(value)
+
+    def isAmountLine(self, line):
+        if (
+            len(line) == 3 and
+            self.linesAreWithinBoundaries(line[0], self.currentColumnBoundaries['description']) and
+            self.linesAreWithinBoundaries(line[1], self.currentColumnBoundaries['date']) and
+            self.linesAreWithinBoundaries(line[2], self.currentColumnBoundaries['amount'])
+        ):
+            return True
+        else:
+            return False
+
+    def linesAreWithinBoundaries(self, line1, line2):
+        # allow a margin of 0.8
+        if (
+            (line1['x0']-line2['x0'] >= -0.8 and line2['x1']-line1['x1'] >= -0.8) or
+            (line2['x0']-line1['x0'] >= -0.8 and line1['x1']-line2['x1'] >= -0.8)
+        ):
+            return True
+        else:
+            return False
