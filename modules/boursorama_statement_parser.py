@@ -18,10 +18,10 @@ class BoursoramaStatementParser:
                 'x0': 32,
                 'x1': 81
             },
-            # 'debit': {
-            #     'x0': ,
-            #     'x1': 
-            # },
+            'debit': {
+                'x0': 310,
+                'x1': 446
+            },
             'credit': {
                 'x0': 453,
                 'x1': 536
@@ -34,6 +34,10 @@ class BoursoramaStatementParser:
         for index, line in enumerate(self.lines):
             if self.isBankAccountLine(line):
                 self.account = self.extractBankAccount(line)
+                continue
+
+            if self.isDebitLine(line):
+                transactions.append(self.extractTransaction(index, self.lines, 'debit'))
                 continue
 
             if self.isCreditLine(line):
@@ -54,7 +58,7 @@ class BoursoramaStatementParser:
         return self.wordIsWithinBoundaries(word, self.columnBoundaries['label'])
 
     def isDateWord(self, word):
-        return self.wordIsWithinBoundaries(word, self.columnBoundaries['date'])
+        return self.wordIsWithinBoundaries(word, self.columnBoundaries['date']) and self.isDate(word['value'])
 
     def isDebitWord(self, word):
         return self.wordIsWithinBoundaries(word, self.columnBoundaries['debit'])
@@ -64,6 +68,15 @@ class BoursoramaStatementParser:
 
     def wordIsWithinBoundaries(self, word, boundary):
         return word['x0'] >= boundary['x0'] and word['x1'] <= boundary['x1']
+
+    def isDebitLine(self, line):
+        if len(line) != 4:
+            return False
+
+        if self.isDateWord(line[0]) and self.isLabelWord(line[1]) and self.isDebitWord(line[3]):
+            return True
+
+        return False
 
     def isCreditLine(self, line):
         if len(line) != 4:
@@ -76,6 +89,10 @@ class BoursoramaStatementParser:
 
     def isDate(self, value):
         dateRegex = r'\d{1,2}\/\d{2}\/\d{4}'
+        return bool(re.match(dateRegex, value))
+
+    def isDateWithoutLeadingZero(self, value):
+        dateRegex = r'\d{1}\/\d{2}\/\d{4}'
         return bool(re.match(dateRegex, value))
 
     def isBankAccountLine(self, line):
@@ -103,9 +120,13 @@ class BoursoramaStatementParser:
           .replace(',', '.')
         )
 
+        date = lines[lineIndex][0]['value']
+        if self.isDateWithoutLeadingZero(date):
+            date = '0' + date
+
         transaction = {
             'account': self.account,
-            'date': lines[lineIndex][0]['value'],
+            'date': date,
             'label': lines[lineIndex][1]['value'],
             'value': value if transactionType == 'credit' else -value
         }

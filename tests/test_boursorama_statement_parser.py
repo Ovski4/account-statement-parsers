@@ -8,7 +8,8 @@ from boursorama_statement_parser import BoursoramaStatementParser
 from pdf_parser import PdfParser
 
 sys.path.append('./tests/files')
-from releve_boursorama import boursorama_lines
+from releve_boursorama_1 import boursorama_lines_1
+from releve_boursorama_2 import boursorama_lines_2
 
 if os.environ.get('DEBUG') == 'true':
     import ptvsd
@@ -17,18 +18,17 @@ if os.environ.get('DEBUG') == 'true':
 
 def testParse():
 
-    parser = BoursoramaStatementParser(boursorama_lines)
+    parser = BoursoramaStatementParser(boursorama_lines_1)
     transactions = parser.parse()
-    with open('./tests/files/expected-results-boursorama.json') as file:
+    with open('./tests/files/expected-results-boursorama-1.json') as file:
         expectedData = json.loads(file.read())
     assert transactions == expectedData
 
-# pdfFile = open('/usr/src/app/tests/files/releve-boursorama.pdf', 'rb')
-# lines = PdfParser().parse(pdfFile)
-# f = open( '/usr/src/app/tests/files/file.py', 'w' )
-# f.write( 'lines = ' + repr(lines) + '\n' )
-# f.close()
-# pdfFile.close()
+    parser = BoursoramaStatementParser(boursorama_lines_2)
+    transactions = parser.parse()
+    with open('./tests/files/expected-results-boursorama-2.json') as file:
+        expectedData = json.loads(file.read())
+    assert transactions == expectedData
 
 def testIsLabelWord():
 
@@ -62,6 +62,49 @@ def testIsDateWord():
     assert parser.isDateWord(lines[1]) == False
     assert parser.isDateWord(lines[2]) == False
 
+def testIsDebitLine():
+    line = [{
+		'value': '1/10/2020',
+		'x0': 32.4,
+		'y0': 500.86,
+		'x1': 80.4,
+		'y1': 492.45
+	}, {
+		'value': 'CARTE 30/09/20 44 BIOCOOP CB*5993',
+		'x0': 82.8,
+		'y0': 500.86,
+		'x1': 274.8,
+		'y1': 492.45
+	}, {
+		'value': '1/10/2020',
+		'x0': 306.0,
+		'y0': 500.86,
+		'x1': 354.0,
+		'y1': 492.45
+	}, {
+		'value': '9,75',
+		'x0': 363.6,
+		'y0': 500.86,
+		'x1': 445.2,
+		'y1': 492.45
+	}]
+
+    parser = BoursoramaStatementParser([line])
+    assert parser.isDebitLine(line) == True
+
+
+def testIsDebitWord():
+
+    lines = [
+        {'value': '1.473,00', 'x0': 453.6, 'y0': 464.86, 'x1': 535.2, 'y1': 456.45},
+        {'value': '9,75', 'x0': 363.6, 'y0': 500.86, 'x1': 445.2, 'y1': 492.45}
+    ]
+
+    parser = BoursoramaStatementParser(lines)
+    assert parser.isDebitWord(lines[0]) == False
+    assert parser.isDebitWord(lines[1]) == True
+
+
 def testIsCreditWord():
 
     lines = [
@@ -74,7 +117,7 @@ def testIsCreditWord():
     assert parser.isCreditWord(lines[1]) == True
 
 def testIsCreditLine():
-    line =[
+    line = [
         {
             'value': '31/08/2020',
             'x0': 32.4,
@@ -105,6 +148,9 @@ def testIsCreditLine():
     parser = BoursoramaStatementParser([line])
     assert parser.isCreditLine(line) == True
 
+    line[0]['value'] = 'not a date'
+    assert parser.isCreditLine(line) == False
+
 def testIsBankAccountLine():
     line = [
         {'value': '2/09/2020', 'x0': 32.4, 'y0': 574.54, 'x1': 74.93, 'y1': 564.14},
@@ -122,6 +168,8 @@ def testIsBankAccountLine():
 
     parser = BoursoramaStatementParser([line])
     assert parser.isBankAccountLine(line) == True
+    line[1]['value'] = 'not a digit'
+    assert parser.isBankAccountLine(line) == False
 
 def testIsDate():
     parser = BoursoramaStatementParser([])

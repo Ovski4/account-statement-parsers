@@ -1,0 +1,140 @@
+[
+    {
+        "account": "40619 60243 00030983444 59",
+        "date": "01/10/2020",
+        "label": "CARTE 30/09/20 44 BIOCOOP CB*5993",
+        "value": -9.75
+    },
+    {
+        "account": "40619 60243 00030983444 59",
+        "date": "02/10/2020",
+        "label": "VIR SEPA M SALAMANCA HECTOR - VIREMENT DU CREDIT MUTUEL - VH02753MVKKSQE01 - Réf : VH02753MVKKSQE01",
+        "value": 1430.00
+    },
+    {
+        "account": "40619 60243 00030983444 59",
+        "date": "05/10/2020",
+        "label": "VIR Loyer Lilo DEBONARD HECTOR SALAM - MME DEFRUIT KARELLE - Réf : SCT406182020100500100668052",
+        "value": -700
+    },
+    {
+        "account": "40619 60243 00030983444 59",
+        "date": "05/10/2020",
+        "label": "PRLV SEPA OUI ENERGY SAS 2020-10 - QR97BC00878417 - RUM: 1-000000000000176261",
+        "value": -54.21
+    },
+    {
+        "account": "40619 60243 00030983444 59",
+        "date": "05/10/2020",
+        "label": "CARTE 03/10/20 44 STATION VOIRIE CB*5993",
+        "value": -2.80
+    },
+    {
+        "account": "40619 60243 00030983444 59",
+        "date": "05/10/2020",
+        "label": "CARTE 04/10/20 AIRBNB * HM3T3DEW CB*5993",
+        "value": -215.89
+    },
+    {
+        "account": "40619 60243 00030983444 59",
+        "date": "06/10/2020",
+        "label": "RETRAIT DAB 03/10/20 ST JULIEN D CB*5993 - 44",
+        "value": -40
+    },
+    {
+        "account": "40619 60243 00030983444 59",
+        "date": "06/10/2020",
+        "label": "CARTE 05/10/20 75 DELIVEROO.FR CB*5993",
+        "value": -17.64
+    },
+    {
+        "account": "40619 60243 00030983444 59",
+        "date": "06/10/2020",
+        "label": "CARTE 05/10/20 44 BIOCOOP CB*5993",
+        "value": -26.18
+    },
+    {
+        "account": "40619 60243 00030983444 59",
+        "date": "06/10/2020",
+        "label": "CARTE 05/10/20 44 HYPER U CB*5993",
+        "value": -40.20
+    },
+    {
+        "account": "40619 60243 00030983444 59",
+        "date": "07/10/2020",
+        "label": "CARTE 04/10/20 44 VERT LA COULEU CB*5993",
+        "value": -19.50
+    },
+    {
+        "account": "40619 60243 00030983444 59",
+        "date": "12/10/2020",
+        "label": "CARTE 10/10/20 85 MAITRE PANNETI CB*5993",
+        "value": -35
+    },
+    {
+        "account": "40619 60243 00030983444 59",
+        "date": "13/10/2020",
+        "label": "RETRAIT DAB 12/10/20 ST HERBLAIN CB*5993 - 44",
+        "value": -150
+    },
+    {
+        "account": "40619 60243 00030983444 59",
+        "date": "13/10/2020",
+        "label": "CARTE 12/10/20 75 DELIVEROO.FR CB*5993",
+        "value": -26.70
+    },
+    {
+        "account": "40619 60243 00030983444 59",
+        "date": "16/10/2020",
+        "label": "CARTE 14/10/20 44 STATION VOIRIE CB*5993",
+        "value": -6
+    },
+    {
+        "account": "40619 60243 00030983444 59",
+        "date": "16/10/2020",
+        "label": "CARTE 14/10/20 85 CAVES CARTRON CB*5993",
+        "value": -25.45
+    },
+    {
+        "account": "40619 60243 00030983444 59",
+        "date": "20/10/2020",
+        "label": "VIR SEPA Compte de Jolan - Virement de HECTOR et Lilo pou - Réf : SCT406182020102000102325952",
+        "value": -41
+    },
+    {
+        "account": "40619 60243 00030983444 59",
+        "date": "20/10/2020",
+        "label": "CARTE 19/10/20 44 STATION U CB*5993",
+        "value": -32.10
+    },
+    {
+        "account": "40619 60243 00030983444 59",
+        "date": "20/10/2020",
+        "label": "CARTE 19/10/20 44 HYPER U CB*5993",
+        "value": -78.32
+    },
+    {
+        "account": "40619 60243 00030983444 59",
+        "date": "21/10/2020",
+        "label": "CARTE 20/10/20 44 STATION VOIRIE CB*5993",
+        "value": -0.97
+    },
+    {
+        "account": "40619 60243 00030983444 59",
+        "date": "27/10/2020",
+        "label": "CARTE 24/10/20 44 A LA BONNE HEU CB*5993",
+        "value": -2.90
+    },
+    {
+        "account": "40619 60243 00030983444 59",
+        "date": "27/10/2020",
+        "label": "CARTE 24/10/20 CARREFOUR BEAULI CB*5993",
+        "value": -60.13
+    },
+    {
+        "account": "40619 60243 00030983444 59",
+        "date": "27/10/2020",
+        "label": "CARTE 24/10/20 44 STATION VOIRIE CB*5993",
+        "value": -1
+    }
+]

@@ -1,4 +1,4 @@
-boursorama_lines = [
+boursorama_lines_1 = [
   [{
     'value': 'Extrait de votre compte en',
     'x0': 284.4,
