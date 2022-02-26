@@ -18,3 +18,9 @@ def testParse():
     with open('./tests/files/expected-results-nbc-checking-account.json') as file:
         expectedData = json.loads(file.read())
     assert transactions == expectedData
+
+    nbcParser = NBCCsvParser('./tests/files/nbc-credit-account.csv')
+    transactions = nbcParser.parse()
+    with open('./tests/files/expected-results-nbc-credit-account.json') as file:
+        expectedData = json.loads(file.read())
+    assert transactions == expectedData
