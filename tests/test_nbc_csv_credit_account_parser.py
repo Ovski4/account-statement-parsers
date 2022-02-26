@@ -4,7 +4,7 @@ import os
 import pytest
 
 sys.path.append('./modules')
-from nbc_csv_parser import NBCCsvParser
+from nbc_csv_credit_account_parser import NBCCsvCreditAccountParser
 
 if os.environ.get('DEBUG') == 'true':
     import ptvsd
@@ -13,13 +13,7 @@ if os.environ.get('DEBUG') == 'true':
 
 def testParse():
 
-    nbcParser = NBCCsvParser('./tests/files/nbc-checking-account.csv')
-    transactions = nbcParser.parse()
-    with open('./tests/files/expected-results-nbc-checking-account.json') as file:
-        expectedData = json.loads(file.read())
-    assert transactions == expectedData
-
-    nbcParser = NBCCsvParser('./tests/files/nbc-credit-account.csv')
+    nbcParser = NBCCsvCreditAccountParser('./tests/files/nbc-credit-account.csv')
     transactions = nbcParser.parse()
     with open('./tests/files/expected-results-nbc-credit-account.json') as file:
         expectedData = json.loads(file.read())
