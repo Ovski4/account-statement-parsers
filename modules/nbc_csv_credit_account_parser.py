@@ -21,3 +21,6 @@ class NBCCsvCreditAccountParser(NBCCsvParser):
             'label': description,
             'value': float(creditValue) - float(debitValue)
         }
+
+    def getFileType(self):
+        return 'credit'
