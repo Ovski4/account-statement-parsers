@@ -1,5 +1,4 @@
 import sys
-import re
 sys.path.append('./modules')
 from line_reader import LineReader
 from pdf_parser import PdfParser
