@@ -19,8 +19,19 @@ The run_api.py script runs a simple http server that will return transactions as
 
 ```bash
 docker-compose run --service-ports api
-
 curl -H "Accept: application/json" -X GET 127.0.0.1/credit-mutuel?statement=/path/to/statement.pdf
+```
+
+Example:
+
+```
+# Create a folder and add your file in it
+mkdir -p files
+cp ../some/path/boursorama-statement.pdf files/releve-boursorama.pdf
+
+# Exec in the container and request the api
+docker exec -it `container_id` bash
+curl -H "Accept: application/json" -X GET 127.0.0.1/boursorama?statement=files/releve-boursorama.pdf
 ```
 
 Tests
