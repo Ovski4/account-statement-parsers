@@ -9,23 +9,46 @@ from caisse_epargne_statement_parser import CaisseEpargneStatementParser
 from functools import reduce
 from n26_statement_parser import N26StatementParser
 from boursorama_statement_parser import BoursoramaStatementParser
+from nbc_csv_parser import NBCCsvParser
 from pdf_parser import PdfParser
 from klein import run, route
 
+parserConfigs = {
+    'nbc': {
+        'module': NBCCsvParser,
+        'type': 'csv'
+    },
+    'credit-mutuel': {
+        'module': CreditMutuelStatementParser,
+        'type': 'pdf'
+    },
+    'caisse-epargne': {
+        'module': CaisseEpargneStatementParser,
+        'type': 'pdf'
+    },
+    'n26': {
+        'module': N26StatementParser,
+        'type': 'pdf'
+    },
+    'boursorama': {
+        'module': BoursoramaStatementParser,
+        'type': 'pdf'
+    }
+}
+
 def parse(file_path, parser_name):
-    pdfFile = open(file_path, 'rb')
-    lines = PdfParser().parse(pdfFile)
-    pdfFile.close()
-    if (parser_name == 'credit-mutuel'):
-        parser = CreditMutuelStatementParser(lines)
-    elif (parser_name == 'caisse-epargne'):
-        parser = CaisseEpargneStatementParser(lines)
-    elif (parser_name == 'n26'):
-        parser = N26StatementParser(lines)
-    elif (parser_name == 'boursorama'):
-        parser = BoursoramaStatementParser(lines)
+    if parser_name not in parserConfigs:
+        raise Exception('Unknown parser with name ' + parser_name)
+
+    parserConfig = parserConfigs[parser_name]
+
+    if parserConfig['type'] == 'pdf':
+        pdfFile = open(file_path, 'rb')
+        lines = PdfParser().parse(pdfFile)
+        pdfFile.close()
+        parser = parserConfig['module'](lines)
     else:
-        raise Exception('Unknown parser with name' + parser_name)
+        parser = parserConfig['module'](file_path)
 
     transactions = parser.parse()
 
