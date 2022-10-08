@@ -1,6 +1,6 @@
 from nbc_csv_parser import NBCCsvParser
 
-class NBCCsvCheckingAccountParser(NBCCsvParser):
+class NBCCsvChequingOrSavingsAccountParser(NBCCsvParser):
 
     '''
     row[0] Date (yyyy-mm-dd)
@@ -23,4 +23,4 @@ class NBCCsvCheckingAccountParser(NBCCsvParser):
         }
 
     def getFileType(self):
-        return 'checking'
+        return 'chequing-or-savings'

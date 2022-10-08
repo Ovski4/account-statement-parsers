@@ -36,8 +36,8 @@ class NBCCsvParser:
         return results.group(3) + '/' + results.group(2) + '/' + results.group(1)
 
     '''
-    Checking account header: Date;Description;Category;Debit;Credit;Balance
+    Chequing or credit account header: Date;Description;Category;Debit;Credit;Balance
     Credit account header: Date;"card Number";Description;Category;Debit;Credit
     '''
     def guessFileTypeFromHeader(self, headerRow):
-        return 'checking' if headerRow[1] == 'Description' else 'credit'
+        return 'chequing-or-savings' if headerRow[1] == 'Description' else 'credit'

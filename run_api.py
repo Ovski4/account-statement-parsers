@@ -9,7 +9,7 @@ from caisse_epargne_statement_parser import CaisseEpargneStatementParser
 from functools import reduce
 from n26_statement_parser import N26StatementParser
 from boursorama_statement_parser import BoursoramaStatementParser
-from nbc_csv_checking_account_parser import NBCCsvCheckingAccountParser
+from nbc_csv_chequing_or_savings_account_parser import NBCCsvChequingOrSavingsAccountParser
 from nbc_csv_credit_account_parser import NBCCsvCreditAccountParser
 from pdf_parser import PdfParser
 from klein import run, route
@@ -19,8 +19,8 @@ parserConfigs = {
         'module': NBCCsvCreditAccountParser,
         'type': 'csv'
     },
-    'nbc-checking': {
-        'module': NBCCsvCheckingAccountParser,
+    'nbc-chequing-or-savings': {
+        'module': NBCCsvChequingOrSavingsAccountParser,
         'type': 'csv'
     },
     'credit-mutuel': {
