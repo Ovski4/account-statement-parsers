@@ -141,7 +141,7 @@ def testLineIsDebit():
     assert parser.isDebitLine(line1) == True
     assert parser.isDebitLine(line2) == True
 
-def testGetStatementYear():
+def testGetTransactionYear():
 
     lines = [
         [
@@ -156,9 +156,20 @@ def testGetStatementYear():
     ]
 
     parser = CaisseEpargneStatementParser(lines)
-    assert parser.getStatementYear(lines[0]) == '2020'
-    assert parser.getStatementYear(lines[1]) == '1999'
-    assert parser.getStatementYear(lines[2]) == '1998'
+
+    # operations from the month before the statement date keep the statement year
+    parser.setStatementPeriod(lines[0])
+    assert parser.getTransactionYear('06/02') == '2020'
+    assert parser.getTransactionYear('01/03') == '2020'
+
+    parser.setStatementPeriod(lines[1])
+    assert parser.getTransactionYear('30/04') == '1999'
+
+    # a january statement holds december operations from the previous year...
+    parser.setStatementPeriod(lines[2])
+    assert parser.getTransactionYear('31/12') == '1998'
+    # ...but an operation dated in january belongs to the statement year
+    assert parser.getTransactionYear('01/01') == '1999'
 
 def testParse():
 

@@ -11,6 +11,7 @@ class CaisseEpargneStatementParser:
         self.currentAccount = None
         self.currentColumnBoundaries = None
         self.lastHeaderTableLineIndex = None
+        self.statementMonth = None
         self.statementYear = None
         self.data = []
 
@@ -30,7 +31,7 @@ class CaisseEpargneStatementParser:
 
         for index, line in enumerate(self.lines):
             if self.isDateLine(line):
-                self.statementYear = self.getStatementYear(line)
+                self.setStatementPeriod(line)
 
             if self.isHeaderTableLine(line):
                 self.currentAccount = self.extractAccountName(self.lines[index-1])
@@ -64,15 +65,23 @@ class CaisseEpargneStatementParser:
     def isDateLine(self, line):
         return bool(re.match(r"^au\s\d+/\d+/\d+\s-\sN°\s\d+$", line[0]['value']))
 
-    def getStatementYear(self, line):
+    def setStatementPeriod(self, line):
         matches = re.search(r'^au\s\d+/(\d+)/(\d+)\s-\sN°\s\d+$', line[0]['value'])
-        year = int(matches.group(2))
-        month = int(matches.group(1))
+        self.statementMonth = int(matches.group(1))
+        self.statementYear = int(matches.group(2))
 
-        if month == 1:
-            return str(year - 1)
+    '''
+    A statement is dated at the end of the period it covers, so it holds operations from the month before.
+    Only the operations actually dated in a month after the statement month belong to the previous year
+    (december operations listed on a january statement).
+    '''
+    def getTransactionYear(self, operationDate):
+        month = int(operationDate.split('/')[1])
+
+        if month > self.statementMonth:
+            return str(self.statementYear - 1)
         else:
-            return str(year)
+            return str(self.statementYear)
 
     def isDebitLine(self, line):
         if len(line) < 3:
@@ -141,7 +150,7 @@ class CaisseEpargneStatementParser:
 
         transaction = {
             'account': self.currentAccount,
-            'date': lines[lineIndex][0]['value'] + '/' +  self.statementYear,
+            'date': lines[lineIndex][0]['value'] + '/' + self.getTransactionYear(lines[lineIndex][0]['value']),
             'label': label,
             'value': value if transactionType == 'credit' else -value
         }
