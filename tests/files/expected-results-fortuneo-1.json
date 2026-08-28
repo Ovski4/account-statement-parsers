@@ -1,0 +1,14 @@
+[
+    {
+        "account": "FR76 3000 1000 0100 0000 0000 123",
+        "date": "20/07/2026",
+        "label": "VIR INST M MARTIN DUPONT VIR DE M MARTIN DUPONT CH3W26201M000000 26201IP1RT000000000",
+        "value": 50.0
+    },
+    {
+        "account": "FR76 3000 1000 0100 0000 0000 123",
+        "date": "31/07/2026",
+        "label": "VIR INST MLLE CLAIRE DURAND Remboursement 032026212100000000000000 26212IP1RT000000000",
+        "value": 1000.0
+    }
+]

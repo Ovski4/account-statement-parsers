@@ -10,6 +10,7 @@ Currently support :
  - **Caisse d'Épargne** pdf account statement files
  - **N26** pdf account statement files
  - **Boursorama** pdf account statement files
+ - **Fortuneo** pdf account statement files
  - **NBC** csv export files
 
 Usage
