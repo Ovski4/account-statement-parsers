@@ -18,7 +18,7 @@ Usage
 The run_api.py script runs a simple http server that will return transactions as JSON.
 
 ```bash
-docker-compose run --service-ports api
+docker compose run --service-ports api
 curl -H "Accept: application/json" -X GET 127.0.0.1/credit-mutuel?statement=/path/to/statement.pdf
 ```
 
@@ -38,7 +38,7 @@ Tests
 -----
 
 ```bash
-docker-compose run tests
+docker compose run tests
 ```
 
 Debug with vscode
@@ -70,7 +70,7 @@ Create the vscode debugger configuration:
 Run the tests
 
 ```bash
-docker-compose run -e DEBUG=true --service-ports tests
+docker compose run -e DEBUG=true --service-ports tests
 ```
 
 And **only after that**, run the debugger in vscode
