@@ -15,6 +15,21 @@ Currently support :
 Usage
 -----
 
+### From the command line
+
+The parse.py script prints the transactions of a single statement as JSON:
+
+```bash
+docker compose run --rm tests python parse.py credit-mutuel files/releve-credit-mutuel.pdf
+docker compose run --rm tests python parse.py credit-mutuel files/releve-credit-mutuel.pdf --balance
+docker compose run --rm tests python parse.py --list
+```
+
+It exits non-zero on failure, with the error on stderr and JSON on stdout only, so it can be
+used from scripts. Run `python parse.py --help` for the full options and exit codes.
+
+### As an http api
+
 The run_api.py script runs a simple http server that will return transactions as JSON.
 
 ```bash
