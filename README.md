@@ -1,7 +1,7 @@
 Account statement parsers
 =========================
 
-[![Build Status](https://travis-ci.org/Ovski4/account-statement-parsers.svg?branch=master)](https://travis-ci.org/Ovski4/account-statement-parsers) [![Coverage Status](https://coveralls.io/repos/github/Ovski4/account-statement-parsers/badge.svg?branch=master)](https://coveralls.io/github/Ovski4/account-statement-parsers?branch=master)
+[![Tests](https://github.com/Ovski4/account-statement-parsers/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/Ovski4/account-statement-parsers/actions/workflows/tests.yml) [![Coverage Status](https://coveralls.io/repos/github/Ovski4/account-statement-parsers/badge.svg?branch=master)](https://coveralls.io/github/Ovski4/account-statement-parsers?branch=master)
 
 This repo provides modules used to extract transactions from account statement pdf files.
 
