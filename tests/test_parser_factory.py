@@ -17,16 +17,17 @@ def testCreateParserCsv():
 
 def testCreateParserPdfFeedsParsedLinesToTheParser(monkeypatch):
 
-    class LineCollector:
+    class StubParser:
         def __init__(self, lines):
             self.lines = lines
         def parse(self):
             return self.lines
 
+    # Create a parser config for the test PDF file
     monkeypatch.setitem(
         parser_factory.parserConfigs,
         'pdf-under-test',
-        {'module': LineCollector, 'type': 'pdf'}
+        {'module': StubParser, 'type': 'pdf'}
     )
 
     parser = create_parser('./tests/files/test.pdf', 'pdf-under-test')
