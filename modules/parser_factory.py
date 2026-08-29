@@ -1,6 +1,5 @@
 import sys
 sys.path.append('./modules')
-from functools import reduce
 from credit_mutuel_statement_parser import CreditMutuelStatementParser
 from caisse_epargne_statement_parser import CaisseEpargneStatementParser
 from n26_statement_parser import N26StatementParser
@@ -52,10 +51,3 @@ def create_parser(file_path, parser_name):
 
 def parse(file_path, parser_name):
     return create_parser(file_path, parser_name).parse()
-
-def compute_balance(transactions):
-
-    def add_transaction_value(a, b):
-        return round(a + b['value'], 2)
-
-    return reduce(add_transaction_value, transactions, 0)

@@ -1,7 +1,8 @@
 import sys
 import json
 sys.path.append('modules')
-from parser_factory import parse, compute_balance
+from parser_factory import parse
+from transactions import compute_balance
 from klein import run, route
 
 def dump_transactions(request, parser_name):

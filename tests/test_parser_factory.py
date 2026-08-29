@@ -4,7 +4,7 @@ import pytest
 
 sys.path.append('./modules')
 import parser_factory
-from parser_factory import create_parser, parse, compute_balance, parserConfigs
+from parser_factory import create_parser, parse, parserConfigs
 from nbc_csv_credit_account_parser import NBCCsvCreditAccountParser
 
 def testParseCsv():
@@ -54,17 +54,3 @@ def testEveryParserConfigIsUsable():
     for name, config in parserConfigs.items():
         assert config['type'] in ('pdf', 'csv')
         assert callable(config['module'])
-
-def testComputeBalance():
-
-    transactions = [{'value': 10.5}, {'value': -4.25}, {'value': 1.1}]
-
-    assert compute_balance(transactions) == 7.35
-
-def testComputeBalanceOfASingleTransaction():
-
-    assert compute_balance([{'value': 50.0}]) == 50.0
-
-def testComputeBalanceOfNoTransactions():
-
-    assert compute_balance([]) == 0
