@@ -1,0 +1,43 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # To keep in sync with the Dockerfile so we get the suite to run against the same interpreter as the image.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        run: pytest --cov=modules --cov-fail-under=95 --cov-report=lcov:coverage.lcov --cov-report=term tests/
+
+      - name: Upload coverage to Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          file: coverage.lcov
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the image
+        run: docker build -t account-statement-parsers .
+
+      # Mount the repository the same way docker-compose.yml does,
+      # because the .dockerignore file keeps /tests out of the image
+      - name: Run the tests inside the image
+        run: docker run --rm -v "$PWD:/usr/src/app" account-statement-parsers pytest --cov=modules tests/
