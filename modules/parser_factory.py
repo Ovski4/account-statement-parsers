@@ -48,6 +48,3 @@ def create_parser(file_path, parser_name):
         return parserConfig['module'](lines)
 
     return parserConfig['module'](file_path)
-
-def parse(file_path, parser_name):
-    return create_parser(file_path, parser_name).parse()

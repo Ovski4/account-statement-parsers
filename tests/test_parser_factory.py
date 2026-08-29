@@ -4,17 +4,18 @@ import pytest
 
 sys.path.append('./modules')
 import parser_factory
-from parser_factory import create_parser, parse, parserConfigs
+from parser_factory import create_parser, parserConfigs
 from nbc_csv_credit_account_parser import NBCCsvCreditAccountParser
 
-def testParseCsv():
+def testCreateParserCsv():
 
-    transactions = parse('./tests/files/nbc-credit-account.csv', 'nbc-credit')
+    parser = create_parser('./tests/files/nbc-credit-account.csv', 'nbc-credit')
+    transactions = parser.parse()
     with open('./tests/files/expected-results-nbc-credit-account.json') as file:
         expectedData = json.loads(file.read())
     assert transactions == expectedData
 
-def testParsePdfFeedsParsedLinesToTheParser(monkeypatch):
+def testCreateParserPdfFeedsParsedLinesToTheParser(monkeypatch):
 
     class LineCollector:
         def __init__(self, lines):
@@ -31,7 +32,6 @@ def testParsePdfFeedsParsedLinesToTheParser(monkeypatch):
     parser = create_parser('./tests/files/test.pdf', 'pdf-under-test')
 
     assert parser.lines[0][0]['value'] == 'Text here'
-    assert parse('./tests/files/test.pdf', 'pdf-under-test') == parser.lines
 
 def testCreateParserReturnsTheConfiguredParser():
 
@@ -43,11 +43,6 @@ def testCreateParserUnknownParserName():
 
     with pytest.raises(Exception):
         create_parser('./tests/files/nbc-credit-account.csv', 'does-not-exist')
-
-def testParseUnknownParserName():
-
-    with pytest.raises(Exception):
-        parse('./tests/files/nbc-credit-account.csv', 'does-not-exist')
 
 def testEveryParserConfigIsUsable():
 
