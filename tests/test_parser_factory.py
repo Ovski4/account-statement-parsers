@@ -4,7 +4,8 @@ import pytest
 
 sys.path.append('./modules')
 import parser_factory
-from parser_factory import parse, compute_balance, parserConfigs
+from parser_factory import create_parser, parse, compute_balance, parserConfigs
+from nbc_csv_credit_account_parser import NBCCsvCreditAccountParser
 
 def testParseCsv():
 
@@ -27,9 +28,21 @@ def testParsePdfFeedsParsedLinesToTheParser(monkeypatch):
         {'module': LineCollector, 'type': 'pdf'}
     )
 
-    lines = parse('./tests/files/test.pdf', 'pdf-under-test')
+    parser = create_parser('./tests/files/test.pdf', 'pdf-under-test')
 
-    assert lines[0][0]['value'] == 'Text here'
+    assert parser.lines[0][0]['value'] == 'Text here'
+    assert parse('./tests/files/test.pdf', 'pdf-under-test') == parser.lines
+
+def testCreateParserReturnsTheConfiguredParser():
+
+    parser = create_parser('./tests/files/nbc-credit-account.csv', 'nbc-credit')
+
+    assert isinstance(parser, NBCCsvCreditAccountParser)
+
+def testCreateParserUnknownParserName():
+
+    with pytest.raises(Exception):
+        create_parser('./tests/files/nbc-credit-account.csv', 'does-not-exist')
 
 def testParseUnknownParserName():
 

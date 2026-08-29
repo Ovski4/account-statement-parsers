@@ -36,7 +36,7 @@ parserConfigs = {
     }
 }
 
-def parse(file_path, parser_name):
+def create_parser(file_path, parser_name):
     if parser_name not in parserConfigs:
         raise Exception('Unknown parser with name ' + parser_name)
 
@@ -46,13 +46,12 @@ def parse(file_path, parser_name):
         pdfFile = open(file_path, 'rb')
         lines = PdfParser().parse(pdfFile)
         pdfFile.close()
-        parser = parserConfig['module'](lines)
-    else:
-        parser = parserConfig['module'](file_path)
+        return parserConfig['module'](lines)
 
-    transactions = parser.parse()
+    return parserConfig['module'](file_path)
 
-    return transactions
+def parse(file_path, parser_name):
+    return create_parser(file_path, parser_name).parse()
 
 def compute_balance(transactions):
 
