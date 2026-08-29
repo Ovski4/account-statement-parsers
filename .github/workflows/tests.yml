@@ -11,8 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Keep in sync with the Dockerfile: the suite must run against the same
-      # interpreter as the image.
+      # To keep in sync with the Dockerfile so we get the suite to run against the same interpreter as the image.
       - uses: actions/setup-python@v5
         with:
           python-version: '3.14'
@@ -38,7 +37,7 @@ jobs:
       - name: Build the image
         run: docker build -t account-statement-parsers .
 
-      # .dockerignore keeps /tests out of the image, so mount the checkout the
-      # same way docker-compose.yml does.
+      # Mount the repository the same way docker-compose.yml does,
+      # because the .dockerignore file keeps /tests out of the image
       - name: Run the tests inside the image
         run: docker run --rm -v "$PWD:/usr/src/app" account-statement-parsers pytest --cov=modules tests/
