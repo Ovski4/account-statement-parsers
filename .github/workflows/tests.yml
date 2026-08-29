@@ -21,7 +21,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run tests
-        run: pytest --cov=modules --cov-fail-under=95 --cov-report=lcov:coverage.lcov --cov-report=term tests/
+        run: pytest --cov=modules --cov-fail-under=98 --cov-report=lcov:coverage.lcov --cov-report=term tests/
 
       - name: Upload coverage to Coveralls
         uses: coverallsapp/github-action@v2
