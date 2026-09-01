@@ -1,7 +1,16 @@
+# Pinned to the versions the image is known to work with, so a rebuild months
+# from now installs the same environment. Bump deliberately, not by drifting.
+#
+# pdfminer.six is the one to be careful with: its layout analysis decides where
+# cell boundaries fall, so a new version can shift coordinates by fractions of a
+# point and invalidate every committed releve_*.py fixture at once. Upgrade it in
+# its own commit and regenerate the fixtures.
 pdfminer.six==20191107
-chardet
-ptvsd
-klein
-pytest
-pytest-cov
-coveralls
+# Not imported anywhere in this repository: pdfminer.six declares it as a
+# dependency, so it is installed either way. Pinned to stop it floating.
+chardet==7.6.0
+ptvsd==4.3.2
+klein==24.8.0
+pytest==9.1.1
+pytest-cov==7.1.0
+coveralls==4.1.0
