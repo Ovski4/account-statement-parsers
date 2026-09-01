@@ -6,6 +6,7 @@ from n26_statement_parser import N26StatementParser
 from boursorama_statement_parser import BoursoramaStatementParser
 from nbc_csv_chequing_or_savings_account_parser import NBCCsvChequingOrSavingsAccountParser
 from nbc_csv_credit_account_parser import NBCCsvCreditAccountParser
+from fortuneo_statement_parser import FortuneoStatementParser
 from pdf_parser import PdfParser
 
 parserConfigs = {
