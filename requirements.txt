@@ -1,13 +1,4 @@
-# The direct dependencies, pinned to the versions the image is known to work
-# with. Bump deliberately, not by drifting. Their own dependencies are not
-# pinned, so this file is not a lock file: chardet, pycryptodome, six and
-# sortedcontainers arrive with pdfminer.six and can still move under a rebuild.
-#
-# pdfminer.six is the one to be careful with: its layout analysis decides where
-# cell boundaries fall, so a new version can shift coordinates by fractions of a
-# point and invalidate every committed releve_*.py fixture at once. Upgrade it in
-# its own commit and regenerate the fixtures.
-pdfminer.six==20191107
+pdfminer.six==20260107
 ptvsd==4.3.2
 klein==24.8.0
 pytest==9.1.1
