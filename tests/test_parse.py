@@ -58,3 +58,13 @@ def testParseWithoutArgumentsExitsTwo():
     assert result.returncode == 2
     assert result.stdout == ''
     assert 'usage:' in result.stderr
+    assert 'parser_name' in result.stderr
+    assert 'file_path' in result.stderr
+
+def testParseWithoutAFileExitsTwo():
+
+    result = runParseScript('nbc-credit')
+
+    assert result.returncode == 2
+    assert result.stdout == ''
+    assert 'file_path' in result.stderr

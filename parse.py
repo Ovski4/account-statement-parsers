@@ -9,6 +9,18 @@ EXIT_OK = 0
 EXIT_FAILURE = 1
 EXIT_USAGE = 2
 
+class ListParsersAction(argparse.Action):
+    """Print the parser names and exit, the way --help and --version do.
+
+    Exiting from inside parse_args is what lets --list stand on its own without
+    making parser_name and file_path optional: argparse only checks for missing
+    positionals once every argument has been handled, and this never gets there.
+    """
+
+    def __call__(self, argumentParser, namespace, values, option_string=None):
+        print('\n'.join(parserConfigs))
+        argumentParser.exit(EXIT_OK)
+
 EPILOG = """\
 examples:
   parse.py nbc-credit tests/files/nbc-credit-account.csv
@@ -40,12 +52,10 @@ def build_argument_parser():
     )
     argumentParser.add_argument(
         'parser_name',
-        nargs='?',
         help='which bank statement format to parse; see --list'
     )
     argumentParser.add_argument(
         'file_path',
-        nargs='?',
         help='the statement to parse'
     )
     argumentParser.add_argument(
@@ -55,8 +65,8 @@ def build_argument_parser():
     )
     argumentParser.add_argument(
         '--list',
-        action='store_true',
-        dest='list_parsers',
+        action=ListParsersAction,
+        nargs=0,
         help='print the available parser names and exit'
     )
 
@@ -71,17 +81,7 @@ def parse_statement(file_path, parser_name, balance):
     return transactions
 
 def main(argv=None):
-    argumentParser = build_argument_parser()
-    arguments = argumentParser.parse_args(argv)
-
-    if arguments.list_parsers:
-        print('\n'.join(parserConfigs))
-        return EXIT_OK
-
-    if arguments.parser_name is None or arguments.file_path is None:
-        argumentParser.print_usage(sys.stderr)
-        print('parse.py: error: a parser name and a file are required', file=sys.stderr)
-        return EXIT_USAGE
+    arguments = build_argument_parser().parse_args(argv)
 
     if arguments.parser_name not in parserConfigs:
         print('Unknown parser with name ' + arguments.parser_name, file=sys.stderr)
