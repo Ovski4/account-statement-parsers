@@ -49,6 +49,33 @@ docker exec -it `container_id` bash
 curl -H "Accept: application/json" -X GET 127.0.0.1/boursorama?statement=files/releve-boursorama.pdf
 ```
 
+Generating test fixtures
+------------------------
+
+`tools/dump_lines.py` turns a statement PDF into a `tests/files/releve_*.py` fixture, so a new
+parser can be written against committed line data instead of a PDF that cannot be shared.
+
+```bash
+docker compose run --rm -T tests python tools/dump_lines.py files/releve-fortuneo.pdf \
+    --name fortuneo_lines_1 --output tests/files/releve_fortuneo_1.py
+```
+
+Anonymisation is on by default, because `tests/files/` is committed: IBANs, BICs, names after a
+civility, addresses and transfer references are replaced with stable fakes, while dates, amounts,
+column headers and summary rows are left exactly as they are.
+
+**It is a helper, not a guarantee.** The rules key off structure — a civility before a name, `IBAN`
+before an account number — so a bare name with nothing in front of it matches nothing. Read the
+fixture before committing it and pass `--scrub 'THE NAME'` for whatever the patterns missed.
+
+```bash
+# check committed fixtures for anything that looks like personal data
+docker compose run --rm -T tests python tools/dump_lines.py --check tests/files/
+```
+
+`--check` exits 3 on a hit and prints the file and line without printing the value. Run
+`python tools/dump_lines.py --help` for `--expected`, `--dry-run` and the rest.
+
 Tests
 -----
 

@@ -1,0 +1,219 @@
+import sys
+import json
+import subprocess
+
+sys.path.append('./tools')
+from dump_lines import Anonymiser, reconcile, check_directory, format_fixture, FAKE_BIC
+
+def cell(value, x0=10.0, y0=700.0, x1=100.0, y1=690.0):
+
+    return {'value': value, 'x0': x0, 'y0': y0, 'x1': x1, 'y1': y1}
+
+def anonymise(value, literals=()):
+
+    return Anonymiser(literals).anonymiseValue(value)
+
+def runDumpLines(*arguments):
+
+    return subprocess.run(
+        [sys.executable, 'tools/dump_lines.py'] + list(arguments),
+        capture_output=True,
+        text=True
+    )
+
+def testIbanIsReplacedKeepingItsSpacing():
+
+    anonymised = anonymise('IBAN FR76 1234 5678 9012 3456 7890 123')
+
+    assert 'FR76 1234' not in anonymised
+    assert anonymised.startswith('IBAN FR76 ')
+    assert [len(group) for group in anonymised.split()] == [4, 4, 4, 4, 4, 4, 4, 3]
+
+def testBicKeepsItsShapeAndIsNotRescrubbed():
+    """The reference rule also matches eleven capitals, so it used to overwrite the
+    fake BIC that the BIC rule had just written."""
+
+    anonymised = anonymise('BIC FTNOFRP1XXX')
+
+    assert anonymised == 'BIC ' + FAKE_BIC
+
+def testStructureIsNeverRewritten():
+    for value in ['ANCIEN SOLDE', 'NOUVEAU SOLDE', 'TOTAL DES OPÉRATIONS DU RELEVÉ',
+                  'Date de Valeur', 'Débit', 'Crédit', '1 050,00', '0,00 €', '31/07/2026']:
+
+        assert anonymise(value) == value
+
+def testCoordinatesAndKeyOrderSurvive():
+    original = cell('M DUPONT MARCEL')
+
+    anonymised = Anonymiser().anonymiseCell(original)
+
+    assert list(anonymised) == list(original)
+    assert [anonymised[key] for key in ('x0', 'y0', 'x1', 'y1')] == [10.0, 700.0, 100.0, 690.0]
+    assert anonymised['value'] != original['value']
+
+def testTheSameNameAlwaysBecomesTheSameFakeName():
+    """Fortuneo splits one transaction's label across several lines, so independent
+    replacement would make the joined label incoherent."""
+    anonymiser = Anonymiser()
+
+    first = anonymiser.anonymiseValue('VIR INST M DUPONT MARCEL')
+    second = anonymiser.anonymiseValue('VIR DE M DUPONT MARCEL')
+
+    assert first.replace('VIR INST ', '') == second.replace('VIR DE ', '')
+
+def testTwoRunsProduceTheSameOutput():
+    value = 'VIR SEPA M DUPONT MARCEL 44100 NANTES REFERENCE12345'
+
+    assert anonymise(value) == anonymise(value)
+
+def testScrubReplacesTextNoPatternCanSee():
+    value = 'BAPTISTE PIERRE JOSEPH'
+
+    assert anonymise(value, ['BAPTISTE PIERRE JOSEPH']) != value
+    assert anonymise(value) == value
+
+def testCounterpartyLeavesABareCivilityAlone():
+    """After the person rule has run, what follows VIR INST can be a bare 'M', and
+    pseudonymising that fragment glued a second fake name onto the first."""
+
+    anonymised = anonymise('VIR INST M DUPONT')
+
+    assert anonymised.count('M ') == 1
+
+def testReconcileAcceptsATotalThatAddsUp():
+    lines = [
+        [cell('ANCIEN SOLDE'), cell('100,00 €')],
+        [cell('NOUVEAU SOLDE'), cell('150,00 €')],
+    ]
+
+    message = reconcile(lines, [{'value': 30.0}, {'value': 20.0}])
+
+    assert 'Reconciled' in message
+
+def testReconcileRaisesWhenTheTotalDisagrees():
+    lines = [
+        [cell('ANCIEN SOLDE'), cell('100,00 €')],
+        [cell('NOUVEAU SOLDE'), cell('150,00 €')],
+    ]
+
+    try:
+        reconcile(lines, [{'value': 30.0}])
+        raise AssertionError('expected a reconciliation failure')
+    except Exception as error:
+        assert 'Reconciliation failed' in str(error)
+
+def testReconcileReadsDebiteurAsANegativeBalance():
+    lines = [
+        [cell('ANCIEN SOLDE'), cell('100,00 €')],
+        [cell('NOUVEAU SOLDE'), cell('DÉBITEUR'), cell('50,00 €')],
+    ]
+
+    message = reconcile(lines, [{'value': -150.0}])
+
+    assert 'Reconciled' in message
+
+def testReconcileIsSkippedWhenTheStatementHasNoSummaryRows():
+
+    assert reconcile([[cell('CARREFOUR')]], [{'value': -10.0}]) is None
+
+def testCheckFindsPersonalDataAndPassesOnceItIsGone(tmp_path):
+    leaky = tmp_path / 'releve_leaky.py'
+    leaky.write_text("lines = [{'value': 'M BOUCHEREAU B', 'x0': 1.0}]\n", encoding='utf-8')
+
+    # A name of ten capitals trips the reference detector too; overlapping hits are fine.
+    assert 'person' in [finding[2] for finding in check_directory(str(tmp_path), [])]
+
+    leaky.write_text(
+        "lines = [{'value': %r, 'x0': 1.0}]\n" % anonymise('M BOUCHEREAU B'),
+        encoding='utf-8'
+    )
+
+    assert check_directory(str(tmp_path), []) == []
+
+def testCheckHonoursTheAllowList(tmp_path):
+    fixture = tmp_path / 'releve_allowed.py'
+    fixture.write_text("lines = [{'value': '44100 NANTES'}]\n", encoding='utf-8')
+
+    assert check_directory(str(tmp_path), []) != []
+    assert check_directory(str(tmp_path), ['44100 NANTES']) == []
+
+def testFixtureHeaderSaysWhereItCameFromAndWhetherItWasScrubbed():
+
+    generated = format_fixture([[cell('x')]], 'my_lines', 'releve.pdf', True)
+
+    assert generated.startswith('# Generated by tools/dump_lines.py from releve.pdf')
+    assert 'Anonymised: yes' in generated
+    assert generated.split('\n')[3].startswith('my_lines = [')
+    assert 'NO, this holds raw statement data' in format_fixture([[cell('x')]], 'l', 'r.pdf', False)
+
+def testDumpWritesAnImportableFixture(tmp_path):
+    output = tmp_path / 'releve_generated.py'
+
+    result = runDumpLines('./tests/files/test.pdf', '--name', 'generated_lines',
+                          '--output', str(output))
+
+    assert result.returncode == 0
+    namespace = {}
+    exec(compile(output.read_text(encoding='utf-8'), str(output), 'exec'), namespace)
+    assert namespace['generated_lines'][0][0]['value'] == 'Text here'
+
+def testDumpIsByteIdenticalAcrossRuns(tmp_path):
+    first = tmp_path / 'first.py'
+    second = tmp_path / 'second.py'
+
+    runDumpLines('./tests/files/test.pdf', '--name', 'lines', '--output', str(first))
+    runDumpLines('./tests/files/test.pdf', '--name', 'lines', '--output', str(second))
+
+    assert first.read_bytes() == second.read_bytes()
+
+def testDryRunWritesNothing(tmp_path):
+    output = tmp_path / 'not-written.py'
+
+    result = runDumpLines('./tests/files/test.pdf', '--name', 'lines',
+                          '--output', str(output), '--dry-run')
+
+    assert result.returncode == 0
+    assert not output.exists()
+    assert 'nothing written' in result.stdout
+
+def testCheckExitsThreeOnAHit(tmp_path):
+    (tmp_path / 'releve_leaky.py').write_text("v = 'M BOUCHEREAU B'\n", encoding='utf-8')
+
+    result = runDumpLines('--check', str(tmp_path))
+
+    assert result.returncode == 3
+    assert 'BOUCHEREAU' not in result.stderr
+    assert 'possible person' in result.stderr
+
+def testMissingNameExitsTwo():
+
+    result = runDumpLines('./tests/files/test.pdf')
+
+    assert result.returncode == 2
+    assert '--name' in result.stderr
+
+def testExpectedWithoutAParserExitsTwo(tmp_path):
+
+    result = runDumpLines('./tests/files/test.pdf', '--name', 'lines',
+                          '--output', str(tmp_path / 'x.py'), '--expected', str(tmp_path / 'x.json'))
+
+    assert result.returncode == 2
+    assert '--parser' in result.stderr
+
+def testUnknownParserExitsTwo(tmp_path):
+
+    result = runDumpLines('./tests/files/test.pdf', '--name', 'lines',
+                          '--output', str(tmp_path / 'x.py'),
+                          '--expected', str(tmp_path / 'x.json'), '--parser', 'nope')
+
+    assert result.returncode == 2
+    assert 'nope' in result.stderr
+
+def testMissingPdfExitsOne(tmp_path):
+
+    result = runDumpLines('./files/does-not-exist.pdf', '--name', 'lines',
+                          '--output', str(tmp_path / 'x.py'))
+
+    assert result.returncode == 1
+    assert 'does-not-exist.pdf' in result.stderr
