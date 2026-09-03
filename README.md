@@ -87,7 +87,13 @@ Create the vscode debugger configuration. Hit `Ctrl+P` in VS Code, then type `>D
 }
 ```
 
-Run the tests
+Add your breakpoints, then run a script:
+
+```bash
+docker compose run --rm --service-ports tests python -m debugpy --listen 0.0.0.0:3000 --wait-for-client parse.py n26 files/n26-statement.pdf
+```
+
+Or run the tests:
 
 ```bash
 docker compose run -e DEBUG=true --service-ports tests
