@@ -35,6 +35,50 @@ class FortuneoStatementParser:
         'Report'
     ]
 
+    '''
+    Acceptance windows, one per column:
+    a cell (some text) belongs to a column when it falls entirely inside that column's window.
+    They are boxes drawn by hand in the empty space around each column, not measurements,
+    so their numbers sit outside the cells they have to match:
+    the 'date' window opens at 45, while the leftmost date text starts at 53.76.
+
+    Fortuneo right aligns the amounts far to the right of their column header,
+    and left aligns the labels far to the left of theirs,
+    so the boundaries cannot be read from the header line but are hardcoded, and
+    were measured on a page whose 'Date' header starts
+    at COLUMN_BOUNDARIES_MEASURED_AT_HEADER_DATE_X0.
+    '''
+    COLUMN_BOUNDARIES = {
+        'date': {
+            'x0': 45,
+            'x1': 80
+        },
+        'date_valeur': {
+            'x0': 82,
+            'x1': 132
+        },
+        'label': {
+            'x0': 133,
+            'x1': 400
+        },
+        'debit': {
+            'x0': 400,
+            'x1': 470
+        },
+        'credit': {
+            'x0': 500,
+            'x1': 560
+        }
+    }
+
+    '''
+    Where the 'Date' header cell starts on the page the windows above were drawn for.
+    Not a boundary itself, only a landmark: the same 'Date' header cell is read on every page
+    and the difference gives that page's offset. The two constants are a matched pair,
+    redrawing the windows against another statement means measuring this one alongside them.
+    '''
+    COLUMN_BOUNDARIES_MEASURED_AT_HEADER_DATE_X0 = 56.88
+
     def __init__(self, lines):
         # the left margin pre pass mutates the lines, work on our own copy so that a fixture
         # can be parsed more than once
@@ -43,33 +87,7 @@ class FortuneoStatementParser:
         self.statementMonth = None
         self.statementYear = None
         self.headerTableSeen = False
-        '''
-        Fortuneo right aligns the amounts far to the right of their column header, and left aligns
-        the labels far to the left of theirs, so the boundaries cannot be read from the header
-        line the way the other pdf parsers do it. They are hardcoded, as in the boursorama parser.
-        '''
-        self.columnBoundaries = {
-            'date': {
-                'x0': 45,
-                'x1': 80
-            },
-            'date_valeur': {
-                'x0': 82,
-                'x1': 132
-            },
-            'label': {
-                'x0': 133,
-                'x1': 400
-            },
-            'debit': {
-                'x0': 400,
-                'x1': 470
-            },
-            'credit': {
-                'x0': 500,
-                'x1': 560
-            }
-        }
+        self.columnBoundaries = copy.deepcopy(FortuneoStatementParser.COLUMN_BOUNDARIES)
 
     def parse(self):
         transactions = []
@@ -85,6 +103,7 @@ class FortuneoStatementParser:
 
             if self.isHeaderTableLine(line):
                 self.headerTableSeen = True
+                self.setColumnBoundariesFromHeaderLine(line)
                 continue
 
             if not self.headerTableSeen:
@@ -131,6 +150,24 @@ class FortuneoStatementParser:
         ):
             return True
         return False
+
+    '''
+    Pages are not all laid out at the same x: page 2 of a statement is translated a few points to
+    the right of page 1. Every page repeats the header table row and carries it along, so the
+    header gives that page's offset from the layout the windows were drawn for, and they move with
+    it. Their slack is uneven and thin in places: the value date window closes 2.69 points past the
+    end of the value date cells, and page 2 is shifted by 4.56, so without this the whole of page 2
+    fails the value date test and every one of its transactions is silently dropped.
+    '''
+    def setColumnBoundariesFromHeaderLine(self, headerLine):
+        offset = headerLine[0]['x0'] - FortuneoStatementParser.COLUMN_BOUNDARIES_MEASURED_AT_HEADER_DATE_X0
+
+        self.columnBoundaries = {}
+        for name, boundary in FortuneoStatementParser.COLUMN_BOUNDARIES.items():
+            self.columnBoundaries[name] = {
+                'x0': boundary['x0'] + offset,
+                'x1': boundary['x1'] + offset
+            }
 
     def isDateWord(self, word):
         return (
@@ -289,6 +326,10 @@ class FortuneoStatementParser:
 
         return balance
 
+    '''
+    Called after the whole statement has been walked, so the boundaries are the ones calibrated on
+    the last header seen. That is the right page: the totals row closes the statement.
+    '''
     def extractOperationTotals(self, line):
         debitTotal = 0.0
         creditTotal = 0.0
