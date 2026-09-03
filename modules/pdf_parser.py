@@ -27,14 +27,37 @@ class PdfParser:
 
         return device.cells
 
+    '''
+    Group the cells into visual lines: cells belong to the same line when their tops are within
+    LINE_THRESHOLD of each other.
+
+    The local y0 is the top of the bounding box and y1 is the bottom.
+
+    The group is measured as a whole rather than against a single cell, and that matters.
+    Comparing every cell to the first cell of the group instead would accept anything within
+    LINE_THRESHOLD above that cell and anything within LINE_THRESHOLD below it, so a group could
+    end up spanning twice the threshold.
+
+    Cells arrive sorted by descending bottom, which is only roughly reading order:
+    a short cell sharing a row's baseline sorts a hair before or after
+    that row's own cells, and its top can land in the gap between two rows. Anchored on such a
+    cell, a group grows wide enough to hold both rows and merges them into one line even though
+    they are further apart than the threshold allows.
+    '''
     def groupLines(self, cells):
         lines = [[]]
 
         for cell in cells:
+            # page, x0, bottom, x1, top, value = cell
             _, x0, y1, x1, y0, value = cell
 
-            if lines[-1] and abs(lines[-1][0]['y0'] - y0) > PdfParser.LINE_THRESHOLD:
-                lines.append([])
+            if lines[-1]:
+                # the tops the group would hold with this cell added to it
+                tops = [word['y0'] for word in lines[-1]] + [y0]
+
+                # too tall to be one visual line, this cell opens the next one
+                if max(tops) - min(tops) > PdfParser.LINE_THRESHOLD:
+                    lines.append([])
 
             lines[-1].append({'value': value, 'x0': x0, 'y0': y0, 'x1': x1, 'y1': y1})
 
