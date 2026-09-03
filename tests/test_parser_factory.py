@@ -1,8 +1,6 @@
-import sys
 import json
 import pytest
 
-sys.path.append('./modules')
 import parser_factory
 from parser_factory import create_parser, parserConfigs
 from nbc_csv_credit_account_parser import NBCCsvCreditAccountParser

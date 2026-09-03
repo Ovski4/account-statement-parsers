@@ -1,15 +1,7 @@
-import sys
 import json
-import os
 import pytest
 
-sys.path.append('./modules')
 from nbc_csv_chequing_or_savings_account_parser import NBCCsvChequingOrSavingsAccountParser
-
-if os.environ.get('DEBUG') == 'true':
-    import ptvsd
-    ptvsd.enable_attach(address = ('0.0.0.0', 3000))
-    ptvsd.wait_for_attach()
 
 def testParse():
 

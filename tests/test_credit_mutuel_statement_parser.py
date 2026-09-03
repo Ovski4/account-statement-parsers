@@ -1,18 +1,9 @@
-import sys
 import json
-import os
 
-sys.path.append('./modules')
 from credit_mutuel_statement_parser import CreditMutuelStatementParser
 from pdf_parser import PdfParser
 
-sys.path.append('./tests/files')
 from releve_credit_mutuel import credit_mutuel_lines_1, credit_mutuel_lines_2
-
-if os.environ.get('DEBUG') == 'true':
-    import ptvsd
-    ptvsd.enable_attach(address = ('0.0.0.0', 3000))
-    ptvsd.wait_for_attach()
 
 def testParse():
 

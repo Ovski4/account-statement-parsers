@@ -60,7 +60,9 @@ docker compose run tests
 Debug with vscode
 -----------------
 
-Create the vscode debugger configuration:
+Install the [python extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python).
+
+Create the vscode debugger configuration. Hit `Ctrl+P` in VS Code, then type `>Debug: Add Configuration`.
 
 ```json
 {
@@ -68,16 +70,18 @@ Create the vscode debugger configuration:
     "configurations": [
         {
             "name": "Remote debugging",
-            "type": "python",
+            "type": "debugpy",
             "request": "attach",
+            "connect": {
+                "host": "localhost",
+                "port": 3000
+            },
             "pathMappings": [
                 {
-                    "localRoot": "${workspaceRoot}",
+                    "localRoot": "${workspaceFolder}",
                     "remoteRoot": "/usr/src/app"
                 }
-            ],
-            "port": 3000,
-            "host": "localhost"
+            ]
         }
     ]
 }
@@ -89,4 +93,5 @@ Run the tests
 docker compose run -e DEBUG=true --service-ports tests
 ```
 
-And **only after that**, run the debugger in vscode
+The run blocks in `tests/conftest.py` until the debugger attaches, so start it from vscode
+**only after that**, then the suite runs.

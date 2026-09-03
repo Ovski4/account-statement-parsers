@@ -1,7 +1,6 @@
-pdfminer.six==20191107
-chardet
-ptvsd
-klein
-pytest
-pytest-cov
-coveralls
+pdfminer.six==20260107
+debugpy==1.8.21
+klein==24.8.0
+pytest==9.1.1
+pytest-cov==7.1.0
+coveralls==4.1.0
