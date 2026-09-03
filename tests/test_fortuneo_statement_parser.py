@@ -1,18 +1,9 @@
-import sys
 import json
-import os
 import pytest
 
-sys.path.append('./modules')
 from fortuneo_statement_parser import FortuneoStatementParser
 
-sys.path.append('./tests/files')
 from releve_fortuneo_1 import fortuneo_lines_1
-
-if os.environ.get('DEBUG') == 'true':
-    import ptvsd
-    ptvsd.enable_attach(address = ('0.0.0.0', 3000))
-    ptvsd.wait_for_attach()
 
 '''
 Page 2 of a real statement is translated this many points to the right of page 1, header row

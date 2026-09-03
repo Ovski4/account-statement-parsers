@@ -47,17 +47,22 @@ class PdfParser:
     def groupLines(self, cells):
         lines = [[]]
 
+        # the tops the current group spans, carried along rather than rescanned for every cell
+        highestTop = None
+        lowestTop = None
+
         for cell in cells:
-            # page, x0, bottom, x1, top, value = cell
             _, x0, y1, x1, y0, value = cell
 
-            if lines[-1]:
-                # the tops the group would hold with this cell added to it
-                tops = [word['y0'] for word in lines[-1]] + [y0]
-
+            if not lines[-1]:
+                highestTop = lowestTop = y0
+            elif max(highestTop, y0) - min(lowestTop, y0) > PdfParser.LINE_THRESHOLD:
                 # too tall to be one visual line, this cell opens the next one
-                if max(tops) - min(tops) > PdfParser.LINE_THRESHOLD:
-                    lines.append([])
+                lines.append([])
+                highestTop = lowestTop = y0
+            else:
+                highestTop = max(highestTop, y0)
+                lowestTop = min(lowestTop, y0)
 
             lines[-1].append({'value': value, 'x0': x0, 'y0': y0, 'x1': x1, 'y1': y1})
 

@@ -1,9 +1,7 @@
 import sys
 import re
-import copy
 sys.path.append('./modules')
-from line_reader import LineReader
-from pdf_parser import PdfParser
+from transactions import compute_balance
 
 class FortuneoStatementParser:
 
@@ -25,7 +23,7 @@ class FortuneoStatementParser:
     '''
     Labels that must never be glued to the previous transaction by the multi line label loop.
     '''
-    LABEL_STOP_WORDS = [
+    LABEL_STOP_WORDS = (
         'TOTAL DES OPÉRATIONS',
         'NOUVEAU SOLDE',
         'ANCIEN SOLDE',
@@ -33,7 +31,7 @@ class FortuneoStatementParser:
         'Total de vos services et frais bancaires',
         'À reporter',
         'Report'
-    ]
+    )
 
     '''
     Acceptance windows, one per column:
@@ -80,14 +78,12 @@ class FortuneoStatementParser:
     COLUMN_BOUNDARIES_MEASURED_AT_HEADER_DATE_X0 = 56.88
 
     def __init__(self, lines):
-        # the left margin pre pass mutates the lines, work on our own copy so that a fixture
-        # can be parsed more than once
-        self.lines = copy.deepcopy(lines)
+        self.lines = lines
         self.account = None
         self.statementMonth = None
         self.statementYear = None
         self.headerTableSeen = False
-        self.columnBoundaries = copy.deepcopy(FortuneoStatementParser.COLUMN_BOUNDARIES)
+        self.columnBoundaries = FortuneoStatementParser.COLUMN_BOUNDARIES
 
     def parse(self):
         transactions = []
@@ -129,27 +125,21 @@ class FortuneoStatementParser:
     those rows hold exactly 4 cells, which is the shape of a transaction row.
     '''
     def removeLeftMarginWords(self):
-        for line in self.lines[:]:
-            for word in line[:]:
-                if word['x1'] < 40:
-                    line.remove(word)
-            if len(line) == 0:
-                self.lines.remove(line)
+        keptLines = [[word for word in line if word['x1'] >= 40] for line in self.lines]
+        self.lines = [line for line in keptLines if line]
 
     def wordIsWithinBoundaries(self, word, boundary):
         return word['x0'] >= boundary['x0'] and word['x1'] <= boundary['x1']
 
     def isHeaderTableLine(self, line):
-        if (
+        return (
             len(line) == 5 and
             line[0]['value'].lower() == 'date' and
             line[1]['value'].lower() == 'date de valeur' and
             line[2]['value'].lower() == 'opération' and
             line[3]['value'].lower() == 'débit' and
             line[4]['value'].lower() == 'crédit'
-        ):
-            return True
-        return False
+        )
 
     '''
     Pages are not all laid out at the same x: page 2 of a statement is translated a few points to
@@ -182,18 +172,13 @@ class FortuneoStatementParser:
         )
 
     def isTransactionLine(self, line, amountColumn):
-        if len(line) != 4:
-            return False
-
-        if (
+        return (
+            len(line) == 4 and
             self.isDateWord(line[0]) and
             self.isDateValeurWord(line[1]) and
             self.wordIsWithinBoundaries(line[2], self.columnBoundaries['label']) and
             self.wordIsWithinBoundaries(line[3], self.columnBoundaries[amountColumn])
-        ):
-            return True
-
-        return False
+        )
 
     def isDebitLine(self, line):
         return self.isTransactionLine(line, 'debit')
@@ -202,10 +187,7 @@ class FortuneoStatementParser:
         return self.isTransactionLine(line, 'credit')
 
     def isLabelStopWord(self, value):
-        for stopWord in FortuneoStatementParser.LABEL_STOP_WORDS:
-            if value.startswith(stopWord):
-                return True
-        return False
+        return value.startswith(FortuneoStatementParser.LABEL_STOP_WORDS)
 
     def extractAmount(self, value):
         value = re.sub(r'\s', '', value)
@@ -289,30 +271,28 @@ class FortuneoStatementParser:
         return day.zfill(2) + '/' + month.zfill(2) + '/' + self.getTransactionYear(operationDate, dateValeur)
 
     def extractTransaction(self, lineIndex, lines, transactionType):
-        value = self.extractAmount(lines[lineIndex][3]['value'])
+        line = lines[lineIndex]
+        value = self.extractAmount(line[3]['value'])
 
         transaction = {
             'account': self.account,
-            'date': self.formatDate(lines[lineIndex][0]['value'], lines[lineIndex][1]['value']),
-            'label': lines[lineIndex][2]['value'],
+            'date': self.formatDate(line[0]['value'], line[1]['value']),
+            'label': line[2]['value'],
             'value': value if transactionType == 'credit' else -value
         }
 
-        startIndex = lineIndex + 1
-        for line in lines[startIndex:]:
+        for index in range(lineIndex + 1, len(lines)):
+            nextLine = lines[index]
             if (
-                len(line) == 1 and
-                self.wordIsWithinBoundaries(line[0], self.columnBoundaries['label']) and
-                not self.isLabelStopWord(line[0]['value'])
+                len(nextLine) != 1 or
+                not self.wordIsWithinBoundaries(nextLine[0], self.columnBoundaries['label']) or
+                self.isLabelStopWord(nextLine[0]['value'])
             ):
-                transaction['label'] = transaction.get('label') + ' ' + line[0]['value']
-            else:
                 break
 
-        return transaction
+            transaction['label'] += ' ' + nextLine[0]['value']
 
-    def isBalanceLine(self, line, label):
-        return line[0]['value'].startswith(label)
+        return transaction
 
     '''
     The balance is printed unsigned, the CRÉDITEUR / DÉBITEUR keyword carries the sign.
@@ -343,16 +323,12 @@ class FortuneoStatementParser:
         return debitTotal, creditTotal
 
     def findLastLineStartingWith(self, label):
-        found = None
+        matching = [line for line in self.lines if line[0]['value'].startswith(label)]
 
-        for line in self.lines:
-            if self.isBalanceLine(line, label):
-                found = line
-
-        return found
+        return matching[-1] if matching else None
 
     def amountsMatch(self, computed, expected):
-        return abs(round(computed, 2) - round(expected, 2)) < 0.005
+        return abs(computed - expected) < 0.005
 
     '''
     A debit and a credit row only differ by the x position of the amount, so a column drifting a
@@ -376,8 +352,7 @@ class FortuneoStatementParser:
         nouveauSolde = self.extractBalance(nouveauSoldeLine)
         debitTotal, creditTotal = self.extractOperationTotals(totalLine)
 
-        values = list(map(lambda transaction: transaction['value'], transactions))
-        computed = sum(values)
+        computed = compute_balance(transactions)
         expected = nouveauSolde - ancienSolde
 
         if not self.amountsMatch(computed, expected):
@@ -389,18 +364,16 @@ class FortuneoStatementParser:
                 % (expected, nouveauSolde, ancienSolde, computed, len(transactions), computed - expected)
             )
 
-        computedDebit = sum([value for value in values if value < 0])
-        if not self.amountsMatch(computedDebit, -debitTotal):
-            raise Exception(
-                'Parsed debits do not match the statement total. Expected %.2f, got %.2f from %d '
-                'transactions (difference: %.2f). An amount was probably read in the wrong column.'
-                % (-debitTotal, computedDebit, len(transactions), computedDebit + debitTotal)
-            )
+        debits = [transaction for transaction in transactions if transaction['value'] < 0]
+        credits = [transaction for transaction in transactions if transaction['value'] > 0]
 
-        computedCredit = sum([value for value in values if value > 0])
-        if not self.amountsMatch(computedCredit, creditTotal):
+        self.validateAgainstColumnTotal('debits', compute_balance(debits), -debitTotal, transactions)
+        self.validateAgainstColumnTotal('credits', compute_balance(credits), creditTotal, transactions)
+
+    def validateAgainstColumnTotal(self, name, computed, expected, transactions):
+        if not self.amountsMatch(computed, expected):
             raise Exception(
-                'Parsed credits do not match the statement total. Expected %.2f, got %.2f from %d '
+                'Parsed %s do not match the statement total. Expected %.2f, got %.2f from %d '
                 'transactions (difference: %.2f). An amount was probably read in the wrong column.'
-                % (creditTotal, computedCredit, len(transactions), computedCredit - creditTotal)
+                % (name, expected, computed, len(transactions), computed - expected)
             )
