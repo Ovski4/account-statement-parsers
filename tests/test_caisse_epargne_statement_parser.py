@@ -1,19 +1,10 @@
-import sys
 import json
-import os
 import pytest
 
-sys.path.append('./modules')
 from caisse_epargne_statement_parser import CaisseEpargneStatementParser
 from pdf_parser import PdfParser
 
-sys.path.append('./tests/files')
 from releve_caisse_epargne import caisse_epargne_lines
-
-if os.environ.get('DEBUG') == 'true':
-    import ptvsd
-    ptvsd.enable_attach(address = ('0.0.0.0', 3000))
-    ptvsd.wait_for_attach()
 
 def testIsHeaderTableLine():
 

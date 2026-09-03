@@ -1,20 +1,11 @@
-import sys
 import json
-import os
 import pytest
 
-sys.path.append('./modules')
 from boursorama_statement_parser import BoursoramaStatementParser
 from pdf_parser import PdfParser
 
-sys.path.append('./tests/files')
 from releve_boursorama_1 import boursorama_lines_1
 from releve_boursorama_2 import boursorama_lines_2
-
-if os.environ.get('DEBUG') == 'true':
-    import ptvsd
-    ptvsd.enable_attach(address = ('0.0.0.0', 3000))
-    ptvsd.wait_for_attach()
 
 def testParse():
 

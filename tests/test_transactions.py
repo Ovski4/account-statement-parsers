@@ -1,6 +1,3 @@
-import sys
-
-sys.path.append('./modules')
 from transactions import compute_balance
 
 def testComputeBalance():

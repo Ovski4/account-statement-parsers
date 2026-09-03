@@ -1,5 +1,5 @@
 pdfminer.six==20260107
-ptvsd==4.3.2
+debugpy==1.8.21
 klein==24.8.0
 pytest==9.1.1
 pytest-cov==7.1.0
