@@ -1,0 +1,379 @@
+import sys
+import re
+sys.path.append('./modules')
+from transactions import compute_balance
+
+class FortuneoStatementParser:
+
+    MONTHS = {
+        'janvier': 1,
+        'février': 2,
+        'mars': 3,
+        'avril': 4,
+        'mai': 5,
+        'juin': 6,
+        'juillet': 7,
+        'août': 8,
+        'septembre': 9,
+        'octobre': 10,
+        'novembre': 11,
+        'décembre': 12
+    }
+
+    '''
+    Labels that must never be glued to the previous transaction by the multi line label loop.
+    '''
+    LABEL_STOP_WORDS = (
+        'TOTAL DES OPÉRATIONS',
+        'NOUVEAU SOLDE',
+        'ANCIEN SOLDE',
+        'Garantie de vos dépôts',
+        'Total de vos services et frais bancaires',
+        'À reporter',
+        'Report'
+    )
+
+    '''
+    Acceptance windows, one per column:
+    a cell (some text) belongs to a column when it falls entirely inside that column's window.
+    They are boxes drawn by hand in the empty space around each column, not measurements,
+    so their numbers sit outside the cells they have to match:
+    the 'date' window opens at 45, while the leftmost date text starts at 53.76.
+
+    Fortuneo right aligns the amounts far to the right of their column header,
+    and left aligns the labels far to the left of theirs,
+    so the boundaries cannot be read from the header line but are hardcoded, and
+    were measured on a page whose 'Date' header starts
+    at COLUMN_BOUNDARIES_MEASURED_AT_HEADER_DATE_X0.
+    '''
+    COLUMN_BOUNDARIES = {
+        'date': {
+            'x0': 45,
+            'x1': 80
+        },
+        'date_valeur': {
+            'x0': 82,
+            'x1': 132
+        },
+        'label': {
+            'x0': 133,
+            'x1': 400
+        },
+        'debit': {
+            'x0': 400,
+            'x1': 470
+        },
+        'credit': {
+            'x0': 500,
+            'x1': 560
+        }
+    }
+
+    '''
+    Where the 'Date' header cell starts on the page the windows above were drawn for.
+    Not a boundary itself, only a landmark: the same 'Date' header cell is read on every page
+    and the difference gives that page's offset. The two constants are a matched pair,
+    redrawing the windows against another statement means measuring this one alongside them.
+    '''
+    COLUMN_BOUNDARIES_MEASURED_AT_HEADER_DATE_X0 = 56.88
+
+    def __init__(self, lines):
+        self.lines = lines
+        self.account = None
+        self.statementMonth = None
+        self.statementYear = None
+        self.headerTableSeen = False
+        self.columnBoundaries = FortuneoStatementParser.COLUMN_BOUNDARIES
+
+    def parse(self):
+        transactions = []
+
+        self.removeLeftMarginWords()
+
+        for index, line in enumerate(self.lines):
+            if self.account is None:
+                self.setAccountFromLine(line)
+
+            if self.statementYear is None:
+                self.setStatementPeriodFromLine(line)
+
+            if self.isHeaderTableLine(line):
+                self.headerTableSeen = True
+                self.setColumnBoundariesFromHeaderLine(line)
+                continue
+
+            if not self.headerTableSeen:
+                continue
+
+            if self.isDebitLine(line):
+                transactions.append(self.extractTransaction(index, self.lines, 'debit'))
+            elif self.isCreditLine(line):
+                transactions.append(self.extractTransaction(index, self.lines, 'credit'))
+
+        if self.account is None:
+            raise Exception(
+                'Could not find the IBAN on the statement. The account block is missing or its '
+                'layout changed, transactions would be returned without an account.'
+            )
+
+        self.validateAgainstStatementBalance(transactions)
+
+        return transactions
+
+    '''
+    The vertical text printed on the left margin comes out as one cell per character and some of
+    those rows hold exactly 4 cells, which is the shape of a transaction row.
+    '''
+    def removeLeftMarginWords(self):
+        keptLines = [[word for word in line if word['x1'] >= 40] for line in self.lines]
+        self.lines = [line for line in keptLines if line]
+
+    def wordIsWithinBoundaries(self, word, boundary):
+        return word['x0'] >= boundary['x0'] and word['x1'] <= boundary['x1']
+
+    def isHeaderTableLine(self, line):
+        return (
+            len(line) == 5 and
+            line[0]['value'].lower() == 'date' and
+            line[1]['value'].lower() == 'date de valeur' and
+            line[2]['value'].lower() == 'opération' and
+            line[3]['value'].lower() == 'débit' and
+            line[4]['value'].lower() == 'crédit'
+        )
+
+    '''
+    Pages are not all laid out at the same x: page 2 of a statement is translated a few points to
+    the right of page 1. Every page repeats the header table row and carries it along, so the
+    header gives that page's offset from the layout the windows were drawn for, and they move with
+    it. Their slack is uneven and thin in places: the value date window closes 2.69 points past the
+    end of the value date cells, and page 2 is shifted by 4.56, so without this the whole of page 2
+    fails the value date test and every one of its transactions is silently dropped.
+    '''
+    def setColumnBoundariesFromHeaderLine(self, headerLine):
+        offset = headerLine[0]['x0'] - FortuneoStatementParser.COLUMN_BOUNDARIES_MEASURED_AT_HEADER_DATE_X0
+
+        self.columnBoundaries = {}
+        for name, boundary in FortuneoStatementParser.COLUMN_BOUNDARIES.items():
+            self.columnBoundaries[name] = {
+                'x0': boundary['x0'] + offset,
+                'x1': boundary['x1'] + offset
+            }
+
+    def isDateWord(self, word):
+        return (
+            self.wordIsWithinBoundaries(word, self.columnBoundaries['date']) and
+            bool(re.match(r'^\d{1,2}/\d{2}$', word['value']))
+        )
+
+    def isDateValeurWord(self, word):
+        return (
+            self.wordIsWithinBoundaries(word, self.columnBoundaries['date_valeur']) and
+            bool(re.match(r'^\d{1,2}/\d{2}/\d{4}$', word['value']))
+        )
+
+    def isTransactionLine(self, line, amountColumn):
+        return (
+            len(line) == 4 and
+            self.isDateWord(line[0]) and
+            self.isDateValeurWord(line[1]) and
+            self.wordIsWithinBoundaries(line[2], self.columnBoundaries['label']) and
+            self.wordIsWithinBoundaries(line[3], self.columnBoundaries[amountColumn])
+        )
+
+    def isDebitLine(self, line):
+        return self.isTransactionLine(line, 'debit')
+
+    def isCreditLine(self, line):
+        return self.isTransactionLine(line, 'credit')
+
+    def isLabelStopWord(self, value):
+        return value.startswith(FortuneoStatementParser.LABEL_STOP_WORDS)
+
+    def extractAmount(self, value):
+        value = re.sub(r'\s', '', value)
+        value = value.replace('€', '').replace('.', '').replace(',', '.')
+
+        return float(value)
+
+    '''
+    pdfminer returns the iban and the bic in a single cell:
+    'IBAN FR76 3000 1000 0100 0000 0000 123 BIC FTNOFRP1XXX'
+    '''
+    def extractIban(self, value):
+        matches = re.search(r'IBAN\s+([A-Z]{2}\d{2}(?:\s[A-Z0-9]{1,4})+)\s+BIC', value)
+
+        if matches is None:
+            matches = re.search(r'\b([A-Z]{2}\d{2}(?:\s[A-Z0-9]{1,4}){4,7})\b', value)
+
+        if matches is None:
+            return None
+
+        iban = matches.group(1)
+        if not self.isValidIban(iban):
+            return None
+
+        return iban
+
+    def isValidIban(self, iban):
+        compactIban = iban.replace(' ', '')
+
+        return (
+            bool(re.match(r'^[A-Z]{2}\d{2}[A-Z0-9]+$', compactIban)) and
+            len(compactIban) >= 15 and
+            len(compactIban) <= 34
+        )
+
+    def setAccountFromLine(self, line):
+        for word in line:
+            iban = self.extractIban(word['value'])
+            if iban is not None:
+                self.account = iban
+                return
+
+    def setStatementPeriodFromLine(self, line):
+        for word in line:
+            matches = re.search(r'Arrêté au \d{1,2}\s+(\S+)\s+(\d{4})', word['value'])
+            if matches is None:
+                continue
+
+            month = FortuneoStatementParser.MONTHS.get(matches.group(1).lower())
+            if month is None:
+                continue
+
+            self.statementMonth = month
+            self.statementYear = int(matches.group(2))
+            return
+
+    '''
+    The date column holds a day and a month only. The statement covers the month it is dated in,
+    so an operation dated in a later month belongs to the previous year (a december operation
+    listed on a january statement).
+    '''
+    def getTransactionYear(self, operationDate, dateValeur):
+        month = int(operationDate.split('/')[1])
+
+        if self.statementYear is not None:
+            year = self.statementYear
+            statementMonth = self.statementMonth
+        else:
+            # fall back on the value date of the row itself
+            year = int(dateValeur.split('/')[2])
+            statementMonth = int(dateValeur.split('/')[1])
+
+        if month > statementMonth:
+            year = year - 1
+
+        return str(year)
+
+    def formatDate(self, operationDate, dateValeur):
+        day, month = operationDate.split('/')
+
+        return day.zfill(2) + '/' + month.zfill(2) + '/' + self.getTransactionYear(operationDate, dateValeur)
+
+    def extractTransaction(self, lineIndex, lines, transactionType):
+        line = lines[lineIndex]
+        value = self.extractAmount(line[3]['value'])
+
+        transaction = {
+            'account': self.account,
+            'date': self.formatDate(line[0]['value'], line[1]['value']),
+            'label': line[2]['value'],
+            'value': value if transactionType == 'credit' else -value
+        }
+
+        for index in range(lineIndex + 1, len(lines)):
+            nextLine = lines[index]
+            if (
+                len(nextLine) != 1 or
+                not self.wordIsWithinBoundaries(nextLine[0], self.columnBoundaries['label']) or
+                self.isLabelStopWord(nextLine[0]['value'])
+            ):
+                break
+
+            transaction['label'] += ' ' + nextLine[0]['value']
+
+        return transaction
+
+    '''
+    The balance is printed unsigned, the CRÉDITEUR / DÉBITEUR keyword carries the sign.
+    '''
+    def extractBalance(self, line):
+        balance = self.extractAmount(line[len(line)-1]['value'])
+
+        for word in line:
+            if 'DÉBITEUR' in word['value'].upper():
+                return -balance
+
+        return balance
+
+    '''
+    Called after the whole statement has been walked, so the boundaries are the ones calibrated on
+    the last header seen. That is the right page: the totals row closes the statement.
+    '''
+    def extractOperationTotals(self, line):
+        debitTotal = 0.0
+        creditTotal = 0.0
+
+        for word in line[1:]:
+            if self.wordIsWithinBoundaries(word, self.columnBoundaries['debit']):
+                debitTotal = self.extractAmount(word['value'])
+            elif self.wordIsWithinBoundaries(word, self.columnBoundaries['credit']):
+                creditTotal = self.extractAmount(word['value'])
+
+        return debitTotal, creditTotal
+
+    def findLastLineStartingWith(self, label):
+        matching = [line for line in self.lines if line[0]['value'].startswith(label)]
+
+        return matching[-1] if matching else None
+
+    def amountsMatch(self, computed, expected):
+        return abs(computed - expected) < 0.005
+
+    '''
+    A debit and a credit row only differ by the x position of the amount, so a column drifting a
+    few points silently flips a sign instead of raising. The statement states its own totals, use
+    them to turn that into a loud failure.
+    '''
+    def validateAgainstStatementBalance(self, transactions):
+        # on a multi page statement only the last occurrence of each row is the final one
+        ancienSoldeLine = self.findLastLineStartingWith('ANCIEN SOLDE')
+        nouveauSoldeLine = self.findLastLineStartingWith('NOUVEAU SOLDE')
+        totalLine = self.findLastLineStartingWith('TOTAL DES OPÉRATIONS')
+
+        if ancienSoldeLine is None or nouveauSoldeLine is None or totalLine is None:
+            raise Exception(
+                'Could not find the ANCIEN SOLDE, TOTAL DES OPÉRATIONS and NOUVEAU SOLDE rows '
+                'needed to check the parsed transactions. The statement layout changed, the '
+                'transactions cannot be trusted.'
+            )
+
+        ancienSolde = self.extractBalance(ancienSoldeLine)
+        nouveauSolde = self.extractBalance(nouveauSoldeLine)
+        debitTotal, creditTotal = self.extractOperationTotals(totalLine)
+
+        computed = compute_balance(transactions)
+        expected = nouveauSolde - ancienSolde
+
+        if not self.amountsMatch(computed, expected):
+            raise Exception(
+                'Parsed transactions do not match the statement balance. Expected %.2f '
+                '(nouveau solde %.2f - ancien solde %.2f), got %.2f from %d transactions '
+                '(difference: %.2f). A transaction was probably missed, duplicated, or '
+                'classified as debit instead of credit.'
+                % (expected, nouveauSolde, ancienSolde, computed, len(transactions), computed - expected)
+            )
+
+        debits = [transaction for transaction in transactions if transaction['value'] < 0]
+        credits = [transaction for transaction in transactions if transaction['value'] > 0]
+
+        self.validateAgainstColumnTotal('debits', compute_balance(debits), -debitTotal, transactions)
+        self.validateAgainstColumnTotal('credits', compute_balance(credits), creditTotal, transactions)
+
+    def validateAgainstColumnTotal(self, name, computed, expected, transactions):
+        if not self.amountsMatch(computed, expected):
+            raise Exception(
+                'Parsed %s do not match the statement total. Expected %.2f, got %.2f from %d '
+                'transactions (difference: %.2f). An amount was probably read in the wrong column.'
+                % (name, expected, computed, len(transactions), computed - expected)
+            )
