@@ -241,6 +241,14 @@ def testNouveauSoldeLineIsNotATransaction():
     assert parser.isCreditLine(line) == False
     assert parser.isDebitLine(line) == False
 
+def testIsPageContentCell():
+
+    # (page, x0, bottom, x1, top, value), as PdfParser hands it over before grouping
+    assert not FortuneoStatementParser.isPageContentCell((1, 29.32, 193.25, 35.32, 196.58, 'L'))
+    assert FortuneoStatementParser.isPageContentCell(
+        (1, 55.68, 193.94, 210.19, 201.94, 'TOTAL DES OPÉRATIONS DU RELEVÉ')
+    )
+
 def testExtractAmount():
 
     parser = FortuneoStatementParser([])

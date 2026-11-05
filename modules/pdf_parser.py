@@ -8,8 +8,18 @@ from pdfminer.pdfpage import PDFPage
 class PdfParser:
     LINE_THRESHOLD = 10
 
-    def parse(self, PDFfile):
-        lines = self.groupLines(self.readPdfFile(PDFfile))
+    '''
+    keepCell, when given, receives each (page, x0, bottom, x1, top, value) cell and drops the ones it
+    rejects before they are grouped. Removing noise from the lines afterwards is too late: noise
+    cells still take part in the grouping and can split a row in two.
+    '''
+    def parse(self, PDFfile, keepCell = None):
+        cells = self.readPdfFile(PDFfile)
+
+        if keepCell is not None:
+            cells = [cell for cell in cells if keepCell(cell)]
+
+        lines = self.groupLines(cells)
         return list(map(lambda line: sorted(line, key = lambda x: x['x0']), lines))
 
     def readPdfFile(self, PDFfile):

@@ -66,7 +66,9 @@ entry point and by `tests/conftest.py`), so imports are flat (`from pdf_parser i
 
 `parser_factory.parserConfigs` maps the parser name — used both as the CLI argument and as the URL
 slug — to `{module, type}`. `type` decides whether the file is run through `PdfParser` first
-(`'pdf'`) or handed to the parser as a path (`'csv'`). **Adding a parser means adding a module in
+(`'pdf'`) or handed to the parser as a path (`'csv'`). A PDF config can add `keepCell`, a filter
+`PdfParser.parse` applies to the raw `(page, x0, bottom, x1, top, value)` cells before grouping them
+into lines (Fortuneo uses it to drop its margin text). **Adding a parser means adding a module in
 `modules/`, importing it in `parser_factory.py`, and adding one `parserConfigs` entry** — the API
 routes (`/<parser_name>` and `/<parser_name>/balance`) and the CLI are generic and pick it up.
 
@@ -107,8 +109,11 @@ machine. The recurring shape:
   label/operation column and append them to the label (multi-line descriptions).
 - pre-pass filtering: Crédit Mutuel strips the vertical decorative line on the left
   (`isVerticalLeftSideWord`), Caisse d'Épargne drops everything with `x0 < 30`, Fortuneo drops
-  everything with `x1 < 40` (`removeLeftMarginWords`) — that vertical margin text comes out one
-  cell per character and some of those rows have exactly the 4-cell shape of a transaction row.
+  everything with `x1 < 40` — that vertical margin text comes out one cell per character and some
+  of those rows have exactly the 4-cell shape of a transaction row. Fortuneo filters it twice:
+  before grouping, through `keepCell` (`isPageContentCell`), because margin cells sitting between
+  a row's cells can split that row in two; and again on the lines (`removeLeftMarginWords`) for
+  lines read without the filter, such as the captured fixture.
 
 Fortuneo is the most defensive of the parsers and worth reading before writing a new one:
 

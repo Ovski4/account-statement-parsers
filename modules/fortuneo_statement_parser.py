@@ -121,11 +121,31 @@ class FortuneoStatementParser:
         return transactions
 
     '''
-    The vertical text printed on the left margin comes out as one cell per character and some of
-    those rows hold exactly 4 cells, which is the shape of a transaction row.
+    The vertical text printed on the left margin ends before this x, the page content starts after.
+    '''
+    LEFT_MARGIN_X1 = 40
+
+    '''
+    The vertical text printed on the left margin comes out as one cell per character. Given to
+    PdfParser so those cells are dropped before grouping: kept, they sit between the cells of a row
+    and can split it, which on the october 2026 statement pushed the amounts of the
+    TOTAL DES OPÉRATIONS row onto a line of their own.
+    '''
+    @staticmethod
+    def isPageContentCell(cell):
+        _, _, _, x1, _, _ = cell
+
+        return x1 >= FortuneoStatementParser.LEFT_MARGIN_X1
+
+    '''
+    The same filter on lines already grouped, for lines read without isPageContentCell, such as the
+    captured fixtures: some margin rows hold exactly 4 cells, which is the shape of a transaction row.
     '''
     def removeLeftMarginWords(self):
-        keptLines = [[word for word in line if word['x1'] >= 40] for line in self.lines]
+        keptLines = [
+            [word for word in line if word['x1'] >= FortuneoStatementParser.LEFT_MARGIN_X1]
+            for line in self.lines
+        ]
         self.lines = [line for line in keptLines if line]
 
     def wordIsWithinBoundaries(self, word, boundary):

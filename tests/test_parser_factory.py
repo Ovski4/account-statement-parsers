@@ -32,6 +32,22 @@ def testCreateParserPdfFeedsParsedLinesToTheParser(monkeypatch):
 
     assert parser.lines[0][0]['value'] == 'Text here'
 
+def testCreateParserPdfAppliesTheConfiguredCellFilter(monkeypatch):
+
+    class StubParser:
+        def __init__(self, lines):
+            self.lines = lines
+
+    monkeypatch.setitem(
+        parser_factory.parserConfigs,
+        'pdf-under-test',
+        {'module': StubParser, 'type': 'pdf', 'keepCell': lambda cell: cell[5] != 'Text here'}
+    )
+
+    parser = create_parser('./tests/files/test.pdf', 'pdf-under-test')
+
+    assert 'Text here' not in [word['value'] for line in parser.lines for word in line]
+
 def testCreateParserReturnsTheConfiguredParser():
 
     parser = create_parser('./tests/files/nbc-credit-account.csv', 'nbc-credit')
@@ -48,3 +64,4 @@ def testEveryParserConfigIsUsable():
     for name, config in parserConfigs.items():
         assert config['type'] in ('pdf', 'csv')
         assert callable(config['module'])
+        assert 'keepCell' not in config or callable(config['keepCell'])

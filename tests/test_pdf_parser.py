@@ -75,3 +75,26 @@ def testNoLineSpansMoreThanTheThreshold():
     for line in lines:
         tops = [word['y0'] for word in line]
         assert max(tops) - min(tops) <= PdfParser.LINE_THRESHOLD
+
+def testParseDropsTheCellsKeepCellRejectsBeforeGrouping(monkeypatch):
+
+    # the TOTAL DES OPÉRATIONS row of the october 2026 fortuneo statement, with the vertical
+    # margin text around it. grouped with the margin, the 'L' opens a new line between the label
+    # and its amounts, 12.34 below the top of the 'B', and the amounts follow it there.
+    cells = [
+        cell('B', 29.32, 35.32, 208.92, 204.92),
+        cell('E', 29.32, 35.32, 204.92, 200.92),
+        cell('D', 29.32, 35.32, 200.92, 196.58),
+        cell('TOTAL DES OPÉRATIONS DU RELEVÉ', 55.68, 210.19, 201.94, 193.94),
+        cell('L', 29.32, 35.32, 196.58, 193.25),
+        cell('4 135,23', 437.04, 468.18, 200.98, 192.98),
+        cell('737,89', 532.32, 556.78, 200.98, 192.98)
+    ]
+    monkeypatch.setattr(PdfParser, 'readPdfFile', lambda self, PDFfile: cells)
+
+    assert len(PdfParser().parse(None)) == 2
+
+    lines = PdfParser().parse(None, lambda cell: cell[3] >= 40)
+
+    assert len(lines) == 1
+    assert [word['value'] for word in lines[0]] == ['TOTAL DES OPÉRATIONS DU RELEVÉ', '4 135,23', '737,89']

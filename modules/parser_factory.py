@@ -36,7 +36,8 @@ parserConfigs = {
     },
     'fortuneo': {
         'module': FortuneoStatementParser,
-        'type': 'pdf'
+        'type': 'pdf',
+        'keepCell': FortuneoStatementParser.isPageContentCell
     }
 }
 
@@ -48,7 +49,7 @@ def create_parser(file_path, parser_name):
 
     if parserConfig['type'] == 'pdf':
         pdfFile = open(file_path, 'rb')
-        lines = PdfParser().parse(pdfFile)
+        lines = PdfParser().parse(pdfFile, parserConfig.get('keepCell'))
         pdfFile.close()
         return parserConfig['module'](lines)
 
